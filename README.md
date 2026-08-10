@@ -1,0 +1,130 @@
+# Bruxa e Magia
+
+Site completo: tarot interativo, horóscopo diário, mapa astral personalizado com pagamento via Pix, jogo de búzios, magia, simpatias, fases da lua, blog, eBooks e área administrativa.
+
+Este guia assume que você **não é desenvolvedor** — todos os passos podem ser feitos pelo navegador, sem instalar nada.
+
+---
+
+## Índice
+
+1. [Colocar o site no ar (GitHub Pages)](#1-colocar-o-site-no-ar-github-pages)
+2. [Ativar o banco de dados (Firebase)](#2-ativar-o-banco-de-dados-firebase)
+3. [Primeiro acesso à área administrativa](#3-primeiro-acesso-à-área-administrativa)
+4. [Aparecer no Google (Search Console)](#4-aparecer-no-google-search-console)
+5. [Avisos importantes antes de divulgar](#5-avisos-importantes-antes-de-divulgar)
+
+---
+
+## 1. Colocar o site no ar (GitHub Pages)
+
+1. Crie uma conta gratuita em [github.com](https://github.com), se ainda não tiver.
+2. Clique em **"New repository"** (Novo repositório).
+   - Nome: `bruxaemagia`
+   - Marque como **Public**
+   - Não marque "Add a README" (já temos um)
+3. Dentro do repositório recém-criado, clique em **"uploading an existing file"** (ou arraste os arquivos direto na página).
+4. Arraste estes arquivos desta pasta para o GitHub:
+   - `index.html`
+   - `robots.txt`
+   - `sitemap.xml`
+   - `README.md`
+5. Clique em **"Commit changes"** para salvar.
+6. Vá em **Settings → Pages** (menu lateral do repositório).
+7. Em "Branch", selecione `main` e pasta `/ (root)`, depois clique em **Save**.
+8. Em alguns minutos, seu site estará no ar em:
+   ```
+   https://SEU-USUARIO.github.io/bruxaemagia/
+   ```
+
+### Se quiser um domínio próprio (ex: bruxaemagia.com.br)
+Depois de comprar o domínio em um registrador (Registro.br, GoDaddy, etc.), em **Settings → Pages → Custom domain**, digite seu domínio e siga as instruções de DNS que o GitHub mostrar.
+
+---
+
+## 2. Ativar o banco de dados (Firebase)
+
+Sem este passo, o site funciona normalmente (tarot, horóscopo, blog, etc.), mas **eBooks, pedidos de mapa astral e a área administrativa ficam vazios**, porque eles precisam de um lugar para salvar os dados.
+
+1. Acesse [console.firebase.google.com](https://console.firebase.google.com) e entre com sua conta Google.
+2. Clique em **"Adicionar projeto"**, dê o nome `bruxaemagia` e siga o assistente (pode desativar o Google Analytics, não é necessário).
+3. Dentro do projeto, no menu lateral, clique em **Compilação → Firestore Database**.
+4. Clique em **"Criar banco de dados"**.
+   - Escolha a localização mais próxima do Brasil (ex: `southamerica-east1`)
+   - Selecione **"Iniciar no modo de teste"** (permite leitura/escrita por 30 dias — depois, ajuste as regras conforme o passo 2.5 abaixo)
+5. **Ajuste as regras para funcionar sem limite de tempo.** Vá em **Firestore Database → Regras** e substitua o conteúdo por:
+   ```
+   rules_version = '2';
+   service cloud.firestore {
+     match /databases/{database}/documents {
+       match /{document=**} {
+         allow read, write: if true;
+       }
+     }
+   }
+   ```
+   Clique em **Publicar**.
+
+   > ⚠️ **Importante:** essas regras permitem que qualquer pessoa leia e grave dados diretamente pela API do Firebase, não só pelo seu site. Isso é uma limitação de qualquer site que não tem um servidor próprio por trás. Para um negócio pequeno é um risco aceitável no início, mas veja o item 5 (Avisos) para entender o que isso significa na prática.
+
+6. Volte à página inicial do projeto (ícone de casa) e clique no ícone **"</>"** (Web) para registrar um app.
+   - Dê um apelido, ex: `site`
+   - **Não** marque "Configurar também o Firebase Hosting"
+   - Clique em **"Registrar app"**
+7. O Firebase vai mostrar um bloco de código parecido com este:
+   ```js
+   const firebaseConfig = {
+     apiKey: "AIzaSy...",
+     authDomain: "bruxaemagia-xxxxx.firebaseapp.com",
+     projectId: "bruxaemagia-xxxxx",
+     storageBucket: "bruxaemagia-xxxxx.appspot.com",
+     messagingSenderId: "123456789",
+     appId: "1:123456789:web:abcdef123456"
+   };
+   ```
+   Copie esses 6 valores.
+8. Abra o arquivo `index.html` (pode editar direto pelo GitHub: abra o arquivo no repositório e clique no ícone de lápis ✏️).
+9. Procure por `firebaseConfig` perto do topo do arquivo (dentro da tag `<script>`, logo depois do `<div class="toast">`) e substitua os valores `"COLE_AQUI..."` pelos valores reais copiados do Firebase.
+10. Clique em **"Commit changes"** para salvar. Em 1-2 minutos o GitHub Pages já estará atualizado com o banco conectado.
+
+---
+
+## 3. Primeiro acesso à área administrativa
+
+1. Acesse seu site publicado e role até o final da página, ou vá direto em `https://SEU-USUARIO.github.io/bruxaemagia/#admin`.
+2. Como é o primeiro acesso, o site vai pedir para você **criar sua senha** (mínimo 6 caracteres). Ela é salva de forma criptografada (hash), não em texto puro.
+3. Depois de criada, use essa senha para entrar sempre que quiser conferir pedidos, cadastrar a chave Pix ou adicionar eBooks.
+4. Na aba **"Chave Pix"**, cadastre sua chave real — sem isso, os clientes não conseguem finalizar o pagamento do mapa astral.
+
+---
+
+## 4. Aparecer no Google (Search Console)
+
+Isso é diferente de "estar no ar" — é o processo de pedir ao Google para indexar (ler e mostrar) seu site nos resultados de busca.
+
+1. Acesse [search.google.com/search-console](https://search.google.com/search-console) com sua conta Google.
+2. Escolha **"Prefixo do URL"** e digite `https://SEU-USUARIO.github.io/bruxaemagia/`.
+3. Verifique a propriedade pelo método **"Tag HTML"**:
+   - O Google vai te dar uma linha parecida com `<meta name="google-site-verification" content="XXXXXXX" />`
+   - Cole essa linha dentro do `<head>` do `index.html` (logo abaixo da tag `<title>`), salve e publique (commit) no GitHub
+   - Volte ao Search Console e clique em **"Verificar"**
+4. Depois de verificado, vá em **Sitemaps** (menu lateral) e envie:
+   ```
+   sitemap.xml
+   ```
+5. Pronto — o Google vai visitar e indexar o site nos próximos dias. Você pode acompanhar o progresso na própria ferramenta.
+
+> Dica: antes de tudo isso, troque `SEU-USUARIO` por seu usuário real do GitHub em **todos** os arquivos (`index.html`, `robots.txt`, `sitemap.xml`) nos lugares onde aparece `https://SEU-USUARIO.github.io/bruxaemagia/`.
+
+---
+
+## 5. Avisos importantes antes de divulgar
+
+Sendo direto sobre os limites reais desta versão, para você decidir com informação completa:
+
+- **Pagamento continua manual.** O site gera um QR Code Pix válido e recebe o comprovante, mas a confirmação de que o dinheiro realmente caiu é feita por você, no painel administrativo. Não há integração bancária automática.
+- **E-mail continua manual.** O painel gera o texto pronto do e-mail para cada pedido; você copia e envia pelo seu provedor de e-mail (Gmail, Outlook, etc.). Não há disparo automático.
+- **Segurança de dados é básica.** As regras do Firestore (passo 2.5) permitem acesso amplo aos dados por qualquer pessoa que souber como consultar a API do Firebase diretamente — isso é bem mais difícil do que usar o site normalmente, mas não é impossível para alguém técnico. Para um volume pequeno de pedidos, isso é uma prática comum em MVPs; se o negócio crescer, vale contratar um desenvolvedor para adicionar autenticação real (Firebase Authentication) restringindo quem pode escrever dados.
+- **Sem backups automáticos.** Vale exportar os pedidos periodicamente (Firestore permite exportar dados pelo console) até ter um processo mais robusto.
+
+Nada disso impede o lançamento — é assim que a maioria dos pequenos negócios digitais começa. São só pontos para você ter clareza do que existe hoje e do que pode evoluir depois.
