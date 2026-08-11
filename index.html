@@ -563,8 +563,8 @@ footer{padding:60px 0 30px; border-top:1px solid var(--line); margin-top:40px;}
   </div>
 </section>
 
-<!-- ADMIN -->
-<section class="section container" id="admin">
+<!-- ADMIN — oculto por padrão; só aparece ao acessar #admin diretamente (ver script no fim da página) -->
+<section class="section container" id="admin" style="display:none;">
   <div class="section-head">
     <p class="eyebrow">🔐 Área administrativa</p>
     <h2>Painel do Oráculo</h2>
@@ -596,7 +596,6 @@ footer{padding:60px 0 30px; border-top:1px solid var(--line); margin-top:40px;}
         <a onclick="navTo(event,'blog')">Blog</a>
         <a onclick="event.preventDefault();openModal('privacy')">Política de Privacidade</a>
         <a onclick="event.preventDefault();openModal('terms')">Termos de Uso</a>
-        <a onclick="navTo(event,'admin')" style="opacity:.6;font-size:12px;">Painel administrativo</a>
       </div>
     </div>
     <div class="footer-bottom">© 2026 Bruxa e Magia. Todos os direitos reservados.</div>
@@ -1455,6 +1454,20 @@ renderBlog();
 renderEbooks();
 renderAdmin();
 drawTarot();
+
+// A seção admin fica invisível na navegação normal do site — só aparece
+// para quem acessar o link direto #admin (uso interno, não é um item de menu).
+function checkAdminVisibility(){
+  const section = document.getElementById('admin');
+  if(location.hash === '#admin'){
+    section.style.display = '';
+    setTimeout(()=>section.scrollIntoView({behavior:'smooth', block:'start'}), 100);
+  } else {
+    section.style.display = 'none';
+  }
+}
+checkAdminVisibility();
+window.addEventListener('hashchange', checkAdminVisibility);
 
 // Chamado pelo script do Supabase assim que o banco de dados conecta —
 // atualiza as seções que dependem de dados salvos (eBooks e o painel administrativo).
