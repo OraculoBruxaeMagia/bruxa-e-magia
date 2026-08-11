@@ -612,31 +612,23 @@ footer{padding:60px 0 30px; border-top:1px solid var(--line); margin-top:40px;}
 <div class="toast" id="toast"></div>
 
 <!-- ============================================================
-     FIREBASE (banco de dados real, funciona em qualquer hospedagem)
-     Preencha firebaseConfig abaixo com os dados do SEU projeto Firebase.
+     SUPABASE (banco de dados real, gratuito, sem cartão de crédito)
+     Preencha SUPABASE_URL e SUPABASE_ANON_KEY abaixo com os dados do SEU projeto.
      Veja o passo a passo completo no README.md do repositório.
 ============================================================= -->
 <script>
-window.__firebaseReady = false;
-(async function initFirebaseStorage(){
-  const firebaseConfig = {
-    apiKey: "COLE_AQUI_SUA_API_KEY",
-    authDomain: "COLE_AQUI.firebaseapp.com",
-    projectId: "COLE_AQUI",
-    storageBucket: "COLE_AQUI.appspot.com",
-    messagingSenderId: "COLE_AQUI",
-    appId: "COLE_AQUI"
-  };
-  if(firebaseConfig.apiKey.startsWith('COLE_AQUI')){
-    console.warn('[Bruxa e Magia] Firebase ainda não configurado — veja o README.md. O site funciona, mas eBooks, pedidos e o painel administrativo ficarão vazios até a configuração ser feita.');
+window.__storageReady = false;
+(async function initSupabaseStorage(){
+  const SUPABASE_URL = "COLE_AQUI_SUA_URL";
+  const SUPABASE_ANON_KEY = "COLE_AQUI_SUA_ANON_KEY";
+
+  if(SUPABASE_URL.startsWith('COLE_AQUI')){
+    console.warn('[Bruxa e Magia] Supabase ainda não configurado — veja o README.md. O site funciona, mas eBooks, pedidos e o painel administrativo ficarão vazios até a configuração ser feita.');
     return;
   }
   try{
-    const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js");
-    const { getFirestore, doc, getDoc, setDoc, deleteDoc, collection, getDocs } = await import("https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js");
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+    const { createClient } = await import("https://esm.sh/@supabase/supabase-js@2");
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     function safeId(key){ return String(key).replace(/[\/]/g, '__'); }
     function clientId(){
@@ -644,40 +636,38 @@ window.__firebaseReady = false;
       if(!id){ id = 'c_' + Date.now().toString(36) + Math.random().toString(36).slice(2); localStorage.setItem('oal_client_id', id); }
       return id;
     }
-    function docRef(key, shared){
-      const col = shared ? 'shared_data' : 'private_data';
-      const id = shared ? safeId(key) : clientId() + '__' + safeId(key);
-      return doc(db, col, id);
-    }
+    function idFor(key, shared){ return shared ? safeId(key) : clientId() + '__' + safeId(key); }
 
-    // Reimplementa a mesma interface window.storage (get/set/delete/list), agora sobre o Firestore.
+    // Reimplementa a mesma interface window.storage (get/set/delete/list), agora sobre o Supabase (Postgres).
     window.storage = {
       async get(key, shared){
-        const snap = await getDoc(docRef(key, shared));
-        if(!snap.exists()) throw new Error('not found');
-        const data = snap.data();
+        const { data, error } = await supabase.from('kv_store').select('value').eq('id', idFor(key, shared)).maybeSingle();
+        if(error) throw error;
+        if(!data) throw new Error('not found');
         return { key, value: data.value, shared: !!shared };
       },
       async set(key, value, shared){
-        await setDoc(docRef(key, shared), { key, value, shared: !!shared, updatedAt: Date.now() });
+        const { error } = await supabase.from('kv_store').upsert({ id: idFor(key, shared), key, value, shared: !!shared, updated_at: new Date().toISOString() });
+        if(error) throw error;
         return { key, value, shared: !!shared };
       },
       async delete(key, shared){
-        await deleteDoc(docRef(key, shared));
+        const { error } = await supabase.from('kv_store').delete().eq('id', idFor(key, shared));
+        if(error) throw error;
         return { key, deleted:true, shared: !!shared };
       },
       async list(prefix, shared){
-        const col = shared ? 'shared_data' : 'private_data';
-        const snap = await getDocs(collection(db, col));
-        const keys = [];
-        snap.forEach(d=>{ const k = d.data().key; if(k && (!prefix || k.startsWith(prefix))) keys.push(k); });
-        return { keys, prefix, shared: !!shared };
+        let q = supabase.from('kv_store').select('key').eq('shared', !!shared);
+        if(prefix) q = q.like('key', prefix + '%');
+        const { data, error } = await q;
+        if(error) throw error;
+        return { keys: (data||[]).map(d=>d.key), prefix, shared: !!shared };
       }
     };
-    window.__firebaseReady = true;
-    if(typeof onFirebaseReady === 'function') onFirebaseReady();
+    window.__storageReady = true;
+    if(typeof onStorageReady === 'function') onStorageReady();
   }catch(err){
-    console.error('[Bruxa e Magia] Erro ao iniciar o Firebase:', err);
+    console.error('[Bruxa e Magia] Erro ao iniciar o Supabase:', err);
   }
 })();
 </script>
@@ -1191,7 +1181,7 @@ async function renderAdmin(){
     <div class="glass admin-lock">
       <div style="font-size:30px;margin-bottom:10px;">⚙️</div>
       <h3>Configuração pendente</h3>
-      <p>O banco de dados (Firebase) ainda não foi configurado neste site. Preencha o <code>firebaseConfig</code> no início do arquivo com os dados do seu projeto Firebase para ativar a área administrativa.</p>
+      <p>O banco de dados (Supabase) ainda não foi configurado neste site. Preencha <code>SUPABASE_URL</code> e <code>SUPABASE_ANON_KEY</code> no início do arquivo com os dados do seu projeto Supabase para ativar a área administrativa.</p>
       <p style="font-size:12px;color:var(--lilac);">Veja o passo a passo no README.md do repositório.</p>
       <button class="btn btn-outline" style="width:100%;" onclick="renderAdmin()">Tentar novamente</button>
     </div>`;
@@ -1466,9 +1456,9 @@ renderEbooks();
 renderAdmin();
 drawTarot();
 
-// Chamado pelo script do Firebase assim que o banco de dados conecta —
+// Chamado pelo script do Supabase assim que o banco de dados conecta —
 // atualiza as seções que dependem de dados salvos (eBooks e o painel administrativo).
-function onFirebaseReady(){
+function onStorageReady(){
   renderEbooks();
   renderAdmin();
 }
