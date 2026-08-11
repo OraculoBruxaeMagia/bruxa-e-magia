@@ -1116,6 +1116,7 @@ async function saveEbooksIndex(list){ await window.storage.set('ebooks-index', J
 
 async function renderEbooks(){
   const list = await getEbooksIndex();
+  window.__ebooksCache = list;
   const grid = document.getElementById('ebookGrid');
   if(!list.length){
     grid.innerHTML = `<div class="glass" style="grid-column:1/-1; padding:44px; text-align:center;">
@@ -1132,11 +1133,19 @@ async function renderEbooks(){
         <p style="font-size:13.5px;">${esc(e.descricao)}</p>
         <div class="ebook-price">${esc(e.preco)}</div>
         <div class="ebook-btns">
-          <button class="btn btn-outline btn-sm" onclick="openModal(\`<h3>${esc(e.titulo)}</h3>${e.capa?`<img src="${esc(e.capa)}" style="width:100%;border-radius:14px;margin-bottom:14px;">`:''}<p>${esc(e.descricao)}</p><p style='color:var(--gold-soft);font-family:var(--serif);font-size:20px;'>${esc(e.preco)}</p>\`)">Conhecer o eBook</button>
+          <button class="btn btn-outline btn-sm" onclick="showEbookModal('${e.id}')">Conhecer o eBook</button>
           <a class="btn btn-gold btn-sm" href="${e.link?esc(e.link):'#'}" target="${e.link?'_blank':'_self'}" onclick="${e.link?'':"event.preventDefault();toast('Link de compra ainda não cadastrado.')"}">Comprar</a>
         </div>
       </div>
     </div>`).join('');
+}
+
+function showEbookModal(id){
+  const e = (window.__ebooksCache || []).find(x => x.id === id);
+  if(!e) return;
+  const img = e.capa ? `<img src="${esc(e.capa)}" style="width:100%;border-radius:14px;margin-bottom:14px;">` : '';
+  const price = `<p style="color:var(--gold-soft);font-family:var(--serif);font-size:20px;">${esc(e.preco)}</p>`;
+  openModal(`<h3>${esc(e.titulo)}</h3>${img}<p>${esc(e.descricao)}</p>${price}`);
 }
 
 /* ============ NEWSLETTER ============ */
