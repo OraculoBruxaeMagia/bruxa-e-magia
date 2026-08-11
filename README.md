@@ -34,7 +34,7 @@ Este guia assume que você **não é desenvolvedor** — todos os passos podem s
 7. Em "Branch", selecione `main` e pasta `/ (root)`, depois clique em **Save**.
 8. Em alguns minutos, seu site estará no ar em:
    ```
-   https://SEU-USUARIO.github.io/bruxaemagia/
+   https://oraculobruxaemagia.github.io/bruxaemagia/
    ```
 
 ### Se quiser um domínio próprio (ex: bruxaemagia.com.br)
@@ -91,7 +91,7 @@ Sem este passo, o site funciona normalmente (tarot, horóscopo, blog, etc.), mas
 
 ## 3. Primeiro acesso à área administrativa
 
-1. Acesse seu site publicado e role até o final da página, ou vá direto em `https://SEU-USUARIO.github.io/bruxaemagia/#admin`.
+1. Acesse seu site publicado e role até o final da página, ou vá direto em `https://oraculobruxaemagia.github.io/bruxaemagia/#admin`.
 2. Como é o primeiro acesso, o site vai pedir para você **criar sua senha** (mínimo 6 caracteres). Ela é salva de forma criptografada (hash), não em texto puro.
 3. Depois de criada, use essa senha para entrar sempre que quiser conferir pedidos, cadastrar a chave Pix ou adicionar eBooks.
 4. Na aba **"Chave Pix"**, cadastre sua chave real — sem isso, os clientes não conseguem finalizar o pagamento do mapa astral.
@@ -103,7 +103,7 @@ Sem este passo, o site funciona normalmente (tarot, horóscopo, blog, etc.), mas
 Isso é diferente de "estar no ar" — é o processo de pedir ao Google para indexar (ler e mostrar) seu site nos resultados de busca.
 
 1. Acesse [search.google.com/search-console](https://search.google.com/search-console) com sua conta Google.
-2. Escolha **"Prefixo do URL"** e digite `https://SEU-USUARIO.github.io/bruxaemagia/`.
+2. Escolha **"Prefixo do URL"** e digite `https://oraculobruxaemagia.github.io/bruxaemagia/`.
 3. Verifique a propriedade pelo método **"Tag HTML"**:
    - O Google vai te dar uma linha parecida com `<meta name="google-site-verification" content="XXXXXXX" />`
    - Cole essa linha dentro do `<head>` do `index.html` (logo abaixo da tag `<title>`), salve e publique (commit) no GitHub
@@ -114,7 +114,7 @@ Isso é diferente de "estar no ar" — é o processo de pedir ao Google para ind
    ```
 5. Pronto — o Google vai visitar e indexar o site nos próximos dias. Você pode acompanhar o progresso na própria ferramenta.
 
-> Dica: antes de tudo isso, troque `SEU-USUARIO` por seu usuário real do GitHub em **todos** os arquivos (`index.html`, `robots.txt`, `sitemap.xml`) nos lugares onde aparece `https://SEU-USUARIO.github.io/bruxaemagia/`.
+> Dica: antes de tudo isso, troque `oraculobruxaemagia` por seu usuário real do GitHub em **todos** os arquivos (`index.html`, `robots.txt`, `sitemap.xml`) nos lugares onde aparece `https://oraculobruxaemagia.github.io/bruxaemagia/`.
 
 ---
 
