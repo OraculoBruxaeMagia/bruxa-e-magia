@@ -1052,11 +1052,14 @@ function getMoonPhaseInfo(date){
   const diffDays = (date.getTime() - knownNewMoon)/86400000;
   let phase = (diffDays % synodic)/synodic;
   if(phase<0) phase += 1;
-  const idx = Math.floor(phase*8) % 8;
+  // Usa a fase NOMEADA mais próxima (arredondando), em vez de "fatiar" o ciclo a partir da lua nova —
+  // assim o dia exato de cada fase (nova, cheia, etc.) cai no nome certo, igual calendários lunares reais.
+  const idx = Math.round(phase*8) % 8;
   const illumination = Math.round((1 - Math.cos(phase*2*Math.PI))/2 * 100);
-  const daysIntoCycle = phase*synodic;
-  const nextBoundaryFrac = (Math.floor(phase*8)+1)/8;
-  const daysToNext = Math.max(1, Math.round((nextBoundaryFrac*synodic) - daysIntoCycle));
+  const nextIdx = (idx+1) % 8;
+  const nextCenterFrac = nextIdx/8;
+  let daysToNext = ((nextCenterFrac - phase + 1) % 1) * synodic;
+  daysToNext = Math.max(1, Math.round(daysToNext));
   return { idx, illumination, daysToNext };
 }
 function renderMoon(){
