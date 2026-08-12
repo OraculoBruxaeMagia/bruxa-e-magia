@@ -266,10 +266,6 @@ form input:focus, form textarea:focus{outline:none; border-color:var(--gold);}
 .social-item{display:flex; align-items:center; gap:10px; padding:14px 22px;}
 .social-item:hover{border-color:var(--gold);}
 
-/* newsletter */
-.newsletter-card{max-width:560px; margin:0 auto; padding:44px; text-align:center;}
-.newsletter-form{display:flex; flex-direction:column; gap:0; text-align:left; margin-top:24px;}
-
 /* footer */
 footer{padding:60px 0 30px; border-top:1px solid var(--line); margin-top:40px;}
 .footer-grid{display:grid; grid-template-columns:1.4fr repeat(2,1fr); gap:40px;}
@@ -344,7 +340,6 @@ footer{padding:60px 0 30px; border-top:1px solid var(--line); margin-top:40px;}
     <div class="mm-divider"></div>
     <a onclick="navTo(event,'ebooks')"><span class="mm-ic">📖</span>eBooks</a>
     <a onclick="navTo(event,'blog')"><span class="mm-ic">📝</span>Blog</a>
-    <a onclick="navTo(event,'newsletter')"><span class="mm-ic">📩</span>Newsletter</a>
   </div>
 </header>
 
@@ -547,22 +542,6 @@ footer{padding:60px 0 30px; border-top:1px solid var(--line); margin-top:40px;}
   <button class="btn btn-outline" onclick="shareMagic()">Compartilhe a magia</button>
 </section>
 
-<!-- NEWSLETTER -->
-<section class="section container" id="newsletter">
-  <div class="glass newsletter-card">
-    <p class="eyebrow">📩 Newsletter</p>
-    <h2>Receba uma mensagem da Lua</h2>
-    <p>Receba conteúdos sobre Lua, Tarot, astrologia, magia, simpatias e novidades da Bruxa e Magia.</p>
-    <form class="newsletter-form" id="newsForm" onsubmit="submitNewsletter(event)">
-      <label>Nome</label>
-      <input type="text" id="nNome" required>
-      <label>E-mail</label>
-      <input type="email" id="nEmail" required>
-      <button type="submit" class="btn btn-gold" style="width:100%;">Quero receber</button>
-    </form>
-  </div>
-</section>
-
 <!-- ADMIN — oculto por padrão; só aparece ao acessar #admin diretamente (ver script no fim da página) -->
 <section class="section container" id="admin" style="display:none;">
   <div class="section-head">
@@ -686,6 +665,7 @@ function openModal(kind){
 function closeModal(){ document.getElementById('modalOverlay').classList.remove('show'); }
 function hashStr(s){ let h=0; for(let i=0;i<s.length;i++){ h = (h<<5)-h + s.charCodeAt(i); h|=0; } return Math.abs(h); }
 function todayKey(){ const d=new Date(); return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`; }
+function esc(s){ return String(s??'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
 /* ============ mobile menu ============ */
 function toggleMenu(){
@@ -713,7 +693,7 @@ window.addEventListener('scroll', ()=>{
 });
 
 const MODALS = {
-  privacy: `<h3>Política de Privacidade</h3><p>Seus dados (nome, e-mail, data, hora e local de nascimento) são coletados apenas para preparar e entregar os conteúdos solicitados, como o Mapa Astral ou a Newsletter. Não divulgamos seus dados pessoais publicamente nem os compartilhamos com terceiros para fins de marketing.</p><p style="font-size:12px;opacity:.8;">Aviso técnico: este site armazena os dados dos pedidos em um sistema de teste vinculado a este link específico, sem criptografia de nível bancário. Antes de operar com clientes reais em maior escala, recomenda-se migrar para uma hospedagem própria com banco de dados dedicado.</p>`,
+  privacy: `<h3>Política de Privacidade</h3><p>Seus dados (nome, e-mail, data, hora e local de nascimento) são coletados apenas para preparar e entregar os conteúdos solicitados, como o Mapa Astral. Não divulgamos seus dados pessoais publicamente nem os compartilhamos com terceiros para fins de marketing.</p><p style="font-size:12px;opacity:.8;">Aviso técnico: este site armazena os dados dos pedidos em um sistema de teste vinculado a este link específico, sem criptografia de nível bancário. Antes de operar com clientes reais em maior escala, recomenda-se migrar para uma hospedagem própria com banco de dados dedicado.</p>`,
   terms: `<h3>Termos de Uso</h3><p>Os conteúdos da Bruxa e Magia — tarot, horóscopo, mapa astral, búzios, magia e simpatias — têm caráter simbólico, reflexivo e de entretenimento, e não substituem orientação médica, psicológica, jurídica ou financeira profissional.</p><p>O Mini Mapa Astral (R$ 15,90) e o Mapa Astral Personalizado (R$ 39,90) são pagos via Pix, com confirmação manual do pagamento e prazo de entrega de até 36 horas após a confirmação.</p>`,
 };
 
@@ -1057,32 +1037,43 @@ function renderSimpatias(){
 
 /* ============ MOON PHASES ============ */
 const PHASES = [
-  {em:'🌑', n:'Lua Nova', d:'Início, introspecção e novas intenções.'},
-  {em:'🌒', n:'Lua Crescente', d:'Ação inicial e construção do que foi plantado.'},
-  {em:'🌓', n:'Quarto Crescente', d:'Superação de desafios e ajustes de rumo.'},
-  {em:'🌔', n:'Crescente Gibosa', d:'Refinamento e paciência antes da colheita.'},
-  {em:'🌕', n:'Lua Cheia', d:'Plenitude, celebração e clareza.'},
-  {em:'🌖', n:'Minguante Gibosa', d:'Gratidão e compartilhamento do que foi colhido.'},
-  {em:'🌗', n:'Quarto Minguante', d:'Liberação do que já não serve.'},
-  {em:'🌘', n:'Lua Minguante', d:'Descanso e preparação para um novo ciclo.'},
+  {em:'🌑', n:'Lua Nova', energia:'Recomeço', d:'O céu escurece por completo para abrir espaço ao que ainda não tem forma. É a pausa entre um ciclo que termina e outro que começa — um convite ao silêncio antes da semente.', convite:'Anote uma intenção para os próximos 29 dias, sem pressa de vê-la crescer ainda.'},
+  {em:'🌒', n:'Lua Crescente', energia:'Impulso', d:'Um fio de luz volta a aparecer no céu. É a fase de dar o primeiro passo real, mesmo pequeno, na direção do que foi plantado na lua nova.', convite:'Escolha uma única ação concreta para tirar sua intenção do papel.'},
+  {em:'🌓', n:'Quarto Crescente', energia:'Superação', d:'A luz e a sombra dividem a lua ao meio — é a fase dos primeiros obstáculos, que testam se a intenção era mesmo sua ou só um desejo passageiro.', convite:'Se algo travou nos últimos dias, ajuste a rota em vez de desistir.'},
+  {em:'🌔', n:'Crescente Gibosa', energia:'Refinamento', d:'Falta pouco para a plenitude, e é fase de ajustar detalhes com paciência, não de acelerar. A pressa aqui costuma custar mais do que economiza.', convite:'Revise o que já foi feito antes de seguir para a próxima etapa.'},
+  {em:'🌕', n:'Lua Cheia', energia:'Plenitude', d:'O ciclo atinge seu ápice de luz. É a fase mais simbólica para celebrar conquistas, iluminar o que estava oculto e sentir com mais intensidade — para o bem e para o desconforto.', convite:'Reserve um momento para reconhecer o que já floresceu, mesmo que pequeno.'},
+  {em:'🌖', n:'Minguante Gibosa', energia:'Gratidão', d:'A luz começa a recuar, e com ela vem o convite a compartilhar o que foi colhido — um aprendizado, uma conquista, um gesto de cuidado com alguém.', convite:'Agradeça, mesmo em silêncio, por algo específico deste ciclo.'},
+  {em:'🌗', n:'Quarto Minguante', energia:'Liberação', d:'Metade sombra, metade luz — só que agora caminhando para dentro. É a fase de soltar o que pesa: hábitos, mágoas, pendências que não servem mais.', convite:'Encerre algo que está em aberto só por inércia.'},
+  {em:'🌘', n:'Lua Minguante', energia:'Descanso', d:'O céu escurece de novo, aos poucos. É a fase de desacelerar, digerir tudo o que o ciclo trouxe, e confiar que o repouso também é parte do crescimento.', convite:'Permita-se um dia mais devagar antes da próxima lua nova.'},
 ];
-function getMoonPhaseIndex(date){
+function getMoonPhaseInfo(date){
   const synodic = 29.53058867;
   const knownNewMoon = Date.UTC(2000,0,6,18,14,0);
   const diffDays = (date.getTime() - knownNewMoon)/86400000;
   let phase = (diffDays % synodic)/synodic;
   if(phase<0) phase += 1;
-  return Math.floor(phase*8) % 8;
+  const idx = Math.floor(phase*8) % 8;
+  const illumination = Math.round((1 - Math.cos(phase*2*Math.PI))/2 * 100);
+  const daysIntoCycle = phase*synodic;
+  const nextBoundaryFrac = (Math.floor(phase*8)+1)/8;
+  const daysToNext = Math.max(1, Math.round((nextBoundaryFrac*synodic) - daysIntoCycle));
+  return { idx, illumination, daysToNext };
 }
 function renderMoon(){
-  const idx = getMoonPhaseIndex(new Date());
-  document.getElementById('moonGridEl').innerHTML = PHASES.map((p,i)=>`
-    <div class="glass moon-item ${i===idx?'current':''}"><span class="em">${p.em}</span><span>${p.n}</span></div>`).join('');
+  const { idx, illumination, daysToNext } = getMoonPhaseInfo(new Date());
+  const p = PHASES[idx];
+  const nextPhase = PHASES[(idx+1) % 8];
+  document.getElementById('moonGridEl').innerHTML = PHASES.map((ph,i)=>`
+    <div class="glass moon-item ${i===idx?'current':''}"><span class="em">${ph.em}</span><span>${ph.n}</span></div>`).join('');
   document.getElementById('moonCurrent').innerHTML = `
-    <span class="em">${PHASES[idx].em}</span>
-    <p class="eyebrow" style="justify-content:center;">Fase atual</p>
-    <h3>${PHASES[idx].n}</h3>
-    <p style="max-width:420px;margin:0 auto;">${PHASES[idx].d}</p>`;
+    <span class="em">${p.em}</span>
+    <p class="eyebrow" style="justify-content:center;">Fase atual · calculada em tempo real</p>
+    <h3>${p.n} <span style="color:var(--gold-soft);font-family:var(--sans);font-size:14px;font-weight:600;">— ${p.energia}</span></h3>
+    <p style="max-width:480px;margin:0 auto;">${p.d}</p>
+    <div class="glass" style="max-width:420px;margin:18px auto 0;padding:14px 18px;text-align:left;">
+      <p style="margin:0;font-size:13.5px;"><b style="color:var(--gold-soft);">✦ Convite: </b>${p.convite}</p>
+    </div>
+    <p style="margin-top:16px;font-size:12.5px;color:var(--lilac);">🌙 aproximadamente ${illumination}% iluminada · ${nextPhase.n} em cerca de ${daysToNext} ${daysToNext===1?'dia':'dias'}</p>`;
 }
 
 /* ============ BLOG ============ */
@@ -1147,18 +1138,6 @@ function showEbookModal(id){
   const price = `<p style="color:var(--gold-soft);font-family:var(--serif);font-size:20px;">${esc(e.preco)}</p>`;
   openModal(`<h3>${esc(e.titulo)}</h3>${img}<p>${esc(e.descricao)}</p>${price}`);
 }
-
-/* ============ NEWSLETTER ============ */
-async function submitNewsletter(e){
-  e.preventDefault();
-  const nome = document.getElementById('nNome').value;
-  const email = document.getElementById('nEmail').value;
-  try{
-    await window.storage.set('newsletter:'+Date.now(), JSON.stringify({nome, email, ts:new Date().toISOString()}), false);
-  }catch(err){}
-  document.getElementById('newsForm').innerHTML = `<div class="glass" style="padding:20px;text-align:center;">✦ Obrigada, ${esc(nome)}! Em breve você receberá uma mensagem da Lua.</div>`;
-}
-function esc(s){ return String(s??'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
 /* ============ SHARE ============ */
 function shareMagic(){
