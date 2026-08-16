@@ -1,7 +1,6 @@
+const https = require('https');
+
 exports.handler = async (event, context) => {
-  // Importa a biblioteca de forma dinâmica para evitar erros de versão do Node
-  const fetch = (await import('node-fetch')).default;
-  
   const signo = event.queryStringParameters.sign || 'aquarius';
   const url = `https://rapidapi.com{signo}&language=pt&type=daily`;
 
@@ -13,32 +12,38 @@ exports.handler = async (event, context) => {
     }
   };
 
-  try {
-    const res = await fetch(url, options);
-    
-    if (!res.ok) {
-      throw new Error(`Erro na API do Horóscopo: Status ${res.status}`);
-    }
+  return new Promise((resolve) => {
+    const req = https.request(url, options, (res) => {
+      let data = '';
 
-    const data = await res.json();
+      res.on('data', (chunk) => {
+        data += chunk;
+      });
 
-    return {
-      statusCode: 200,
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers": "Content-Type",
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(data)
-    };
-  } catch (error) {
-    return {
-      statusCode: 500,
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ error: "Falha ao carregar os dados.", detalhe: error.message })
-    };
-  }
+      res.on('end', () => {
+        resolve({
+          statusCode: res.statusCode,
+          headers: {
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Headers": "Content-Type",
+            "Content-Type": "application/json"
+          },
+          body: data
+        });
+      });
+    });
+
+    req.on('error', (error) => {
+      resolve({
+        statusCode: 500,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ error: "Falha ao carregar os dados.", detalhe: error.message })
+      });
+    });
+
+    req.end();
+  });
 };
