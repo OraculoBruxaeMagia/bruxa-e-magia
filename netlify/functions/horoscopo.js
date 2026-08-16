@@ -3,8 +3,8 @@ const https = require('https');
 exports.handler = async (event, context) => {
   const signo = (event.queryStringParameters && event.queryStringParameters.sign) || 'aquarius';
   
-  // URL montada de forma simples e limpa
-  const url = 'https://rapidapi.com' + signo + '&language=pt&type=daily';
+  // Endereço correto e isolado para evitar misturas de texto
+  const urlCompleta = 'https://rapidapi.com' + signo + '&language=pt&type=daily';
 
   const options = {
     method: 'GET',
@@ -15,7 +15,7 @@ exports.handler = async (event, context) => {
   };
 
   return new Promise((resolve) => {
-    const req = https.request(url, options, (res) => {
+    const req = https.request(urlCompleta, options, (res) => {
       let data = '';
 
       res.on('data', (chunk) => {
