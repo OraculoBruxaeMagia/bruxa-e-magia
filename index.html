@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head><meta name="google-site-verification" content="6iBP0DWeKW3u41ndjRDSS7_8OdxsDoCJOA0CE3WpOkM" />
+<head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title><meta name="Bruxa e Magia — Tarot, Astrologia, Mapa Astral e Magia</title>
+<title>Bruxa e Magia — Tarot, Astrologia, Mapa Astral e Magia</title>
 <meta name="description" content="Bruxa e Magia: tarot interativo, horóscopo diário, mapa astral personalizado, jogo de búzios, magia, simpatias e eBooks sobre autoconhecimento e espiritualidade.">
 <meta name="keywords" content="tarot online, horóscopo diário, mapa astral, jogo de búzios, magia, simpatias, astrologia, autoconhecimento">
 <meta name="robots" content="index, follow">
@@ -790,14 +790,56 @@ const SIGNS = [
   {n:'Leão', s:'♌'},{n:'Virgem', s:'♍'},{n:'Libra', s:'♎'},{n:'Escorpião', s:'♏'},
   {n:'Sagitário', s:'♐'},{n:'Capricórnio', s:'♑'},{n:'Aquário', s:'♒'},{n:'Peixes', s:'♓'},
 ];
+// 14 variações por categoria (mais do que os 12 signos) para garantir que, no mesmo dia,
+// nenhum signo repita a frase de outro — a distribuição diária é feita por embaralhamento
+// determinístico (mesma lógica todo mundo vê no mesmo dia, muda dia a dia).
 const HORO_VARIANTS = {
-  amor:['Momento de abrir espaço para conversas sinceras.','A leveza aproxima; a pressa afasta — vá com calma.','Um gesto pequeno pode fortalecer um vínculo importante.','Boa fase para ouvir mais e reagir menos.','A conexão verdadeira pede presença, não perfeição.','Cuide dos silêncios tanto quanto das palavras.'],
-  trabalho:['Organização traz clareza para os próximos passos.','Um projeto parado pode ganhar novo fôlego.','Evite prometer mais do que consegue entregar hoje.','Boa energia para revisar um plano antes de agir.','Parcerias podem render bons resultados.','Confie no ritmo que já vem funcionando.'],
-  dinheiro:['Reveja um gasto que pode esperar.','Boa fase para organizar as contas com calma.','Evite decisões financeiras por impulso.','Um planejamento simples já faz diferença agora.','Guardar um pouco hoje traz alívio amanhã.','Avalie prioridades antes de qualquer compra maior.'],
-  bemestar:['Durma um pouco mais cedo hoje, se puder.','Uma pausa de alguns minutos já ajuda a recentrar.','Beba água, respire fundo, desacelere.','O corpo pede menos pressa nesse momento.','Um passeio curto pode clarear a mente.','Cuide da sua energia antes de cuidar de tudo mais.'],
-  conselho:['Confie no seu tempo, mesmo quando parecer lento.','A Lua convida à escuta antes da resposta.','Nem tudo precisa ser resolvido hoje.','Deixe a intuição guiar uma decisão pequena.','O silêncio também é uma forma de sabedoria.','Observe os sinais sutis ao seu redor.'],
+  amor:['Momento de abrir espaço para conversas sinceras.','A leveza aproxima; a pressa afasta — vá com calma.','Um gesto pequeno pode fortalecer um vínculo importante.','Boa fase para ouvir mais e reagir menos.','A conexão verdadeira pede presença, não perfeição.','Cuide dos silêncios tanto quanto das palavras.','Um reencontro pode trazer clareza sobre o que você sente.','Evite interpretar o silêncio do outro como resposta.','Vulnerabilidade, hoje, é força — não fraqueza.','Um "eu sinto" bem colocado vale mais que mil justificativas.','A paciência de hoje evita um desgaste amanhã.','Deixe alguém especial saber que você percebeu o esforço dele.','Nem toda distância é rejeição — às vezes é só um respiro.','Um convite simples pode reaproximar quem andou afastado.'],
+  trabalho:['Organização traz clareza para os próximos passos.','Um projeto parado pode ganhar novo fôlego.','Evite prometer mais do que consegue entregar hoje.','Boa energia para revisar um plano antes de agir.','Parcerias podem render bons resultados.','Confie no ritmo que já vem funcionando.','Uma conversa direta resolve mais do que um e-mail longo.','É dia de terminar algo pequeno, não de começar dez coisas novas.','Peça ajuda antes que a tarefa vire um peso sozinho.','Sua ideia merece ser dita em voz alta hoje.','Delegar não é fraqueza, é estratégia.','Revise prazos com calma antes de assumir mais um compromisso.','Um elogio sincero a alguém do time rende mais do que parece.','O que travou ontem pode destravar com uma pausa curta agora.'],
+  dinheiro:['Reveja um gasto que pode esperar.','Boa fase para organizar as contas com calma.','Evite decisões financeiras por impulso.','Um planejamento simples já faz diferença agora.','Guardar um pouco hoje traz alívio amanhã.','Avalie prioridades antes de qualquer compra maior.','Compare preços antes de fechar algo hoje.','Uma dívida pequena, resolvida agora, pesa menos no futuro.','Vale revisar assinaturas que você já nem usa mais.','Guarde o comprovante — pode fazer diferença depois.','Hoje é mais dia de planilha do que de vitrine.','Um extra inesperado pede prudência, não empolgação.','Antes de emprestar, pense em como isso afeta seu próprio mês.','Pequenas economias de hoje sustentam um objetivo maior.'],
+  bemestar:['Durma um pouco mais cedo hoje, se puder.','Uma pausa de alguns minutos já ajuda a recentrar.','Beba água, respire fundo, desacelere.','O corpo pede menos pressa nesse momento.','Um passeio curto pode clarear a mente.','Cuide da sua energia antes de cuidar de tudo mais.','Desligar as notificações por uma hora já ajuda bastante.','Um alongamento rápido muda o resto do seu dia.','Coma com calma, sem tela na frente, ao menos uma vez hoje.','Sua respiração é o controle mais rápido que você tem à mão.','Descansar não é atraso — é parte do processo.','Um "não" hoje pode ser o maior ato de autocuidado.','Luz do sol e alguns minutos ao ar livre fazem diferença real.','Perceba a tensão nos ombros antes que ela vire dor de cabeça.'],
+  conselho:['Confie no seu tempo, mesmo quando parecer lento.','A Lua convida à escuta antes da resposta.','Nem tudo precisa ser resolvido hoje.','Deixe a intuição guiar uma decisão pequena.','O silêncio também é uma forma de sabedoria.','Observe os sinais sutis ao seu redor.','O que insiste em voltar à sua mente merece atenção.','Às vezes, esperar é a ação mais corajosa.','Confie mais no que sente do que no que teme.','Uma pergunta sincera vale mais que dez suposições.','O universo raramente grita — geralmente sussurra.','Solte o que já não cabe na pessoa que você está virando.','Gratidão por um detalhe pequeno muda o tom do seu dia.','Sua intuição já sabe — a mente só está demorando a aceitar.'],
 };
-const CORES = ['Lilás','Dourado','Azul-noite','Branco perolado','Roxo ametista','Verde-lua'];
+const CORES = ['Lilás','Dourado','Azul-noite','Branco perolado','Roxo ametista','Verde-lua','Vinho','Prata','Âmbar','Turquesa','Coral','Índigo','Rosa-antigo','Bronze'];
+
+// Embaralhamento determinístico (mesmo "sorteio" para todo mundo no mesmo dia,
+// muda sozinho a cada novo dia) — garante 0 repetição entre os 12 signos.
+function seededShuffle(arr, seed){
+  let a = seed >>> 0;
+  const rng = () => { a |= 0; a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+  const out = arr.slice();
+  for(let i=out.length-1;i>0;i--){ const j = Math.floor(rng()*(i+1)); [out[i],out[j]] = [out[j],out[i]]; }
+  return out;
+}
+let __dailyAssignments = null;
+function getDailyAssignments(){
+  if(__dailyAssignments && __dailyAssignments.day === todayKey()) return __dailyAssignments.data;
+  const data = {};
+  ['amor','trabalho','dinheiro','bemestar','conselho'].forEach(cat=>{
+    const seed = hashStr(todayKey()+'-'+cat);
+    data[cat] = seededShuffle([...Array(HORO_VARIANTS[cat].length).keys()], seed);
+  });
+  const corSeed = hashStr(todayKey()+'-cor');
+  data.cor = seededShuffle([...Array(CORES.length).keys()], corSeed);
+  __dailyAssignments = { day: todayKey(), data };
+  return data;
+}
+function localHoroscope(signIndex){
+  const sign = SIGNS[signIndex];
+  const assign = getDailyAssignments();
+  const seed = todayKey()+'-'+sign.n;
+  const num = (hashStr(seed+'num') % 89) + 1;
+  return {
+    amor: HORO_VARIANTS.amor[assign.amor[signIndex] % HORO_VARIANTS.amor.length],
+    trabalho: HORO_VARIANTS.trabalho[assign.trabalho[signIndex] % HORO_VARIANTS.trabalho.length],
+    dinheiro: HORO_VARIANTS.dinheiro[assign.dinheiro[signIndex] % HORO_VARIANTS.dinheiro.length],
+    bemestar: HORO_VARIANTS.bemestar[assign.bemestar[signIndex] % HORO_VARIANTS.bemestar.length],
+    conselho: HORO_VARIANTS.conselho[assign.conselho[signIndex] % HORO_VARIANTS.conselho.length],
+    cor: CORES[assign.cor[signIndex] % CORES.length],
+    numero: num,
+  };
+}
+
 function renderZodiac(){
   const grid = document.getElementById('zodiacGrid');
   grid.innerHTML = SIGNS.map((s,i)=>`
@@ -807,29 +849,72 @@ function renderZodiac(){
   const d = new Date();
   document.getElementById('horoTodayLabel').textContent = 'Atualizado em ' + d.toLocaleDateString('pt-BR', {day:'2-digit', month:'long', year:'numeric'});
 }
-function showHoro(i){
+
+// Tenta buscar o horóscopo real na função segura do Netlify (/.netlify/functions/horoscopo).
+// Se a função ainda não estiver publicada, falhar, ou demorar demais, cai automaticamente
+// no conteúdo local (que já garante 0 repetição entre signos no mesmo dia).
+async function fetchRemoteHoroscope(sign){
+  const controller = new AbortController();
+  const timeout = setTimeout(()=>controller.abort(), 4000);
+  try{
+    const res = await fetch(`/.netlify/functions/horoscopo?sign=${encodeURIComponent(sign.n.toUpperCase())}`, {signal: controller.signal});
+    clearTimeout(timeout);
+    if(!res.ok) return null;
+    const data = await res.json();
+    if(!data || data.error) return null;
+    // Mapeamento defensivo: aceita alguns formatos comuns de campo, já que a API
+    // externa pode não usar exatamente os mesmos nomes do nosso site.
+    const pick = (...keys) => { for(const k of keys){ if(data[k]) return data[k]; } return null; };
+    const amor = pick('amor','love','romance');
+    const trabalho = pick('trabalho','work','career','profissional');
+    const dinheiro = pick('dinheiro','money','finance','financas');
+    const bemestar = pick('bem_estar','bemestar','health','wellness','saude');
+    const conselho = pick('conselho','advice','tip','mensagem') || pick('description','geral','resumo');
+    const cor = pick('cor','color','lucky_color','cor_da_sorte');
+    const numero = pick('numero','number','lucky_number','numero_da_sorte');
+    // Se a API não trouxe pelo menos amor/trabalho/dinheiro, considera insuficiente e usa o plano B.
+    if(!amor || !trabalho || !dinheiro) return null;
+    return {
+      amor, trabalho, dinheiro,
+      bemestar: bemestar || localHoroscope(SIGNS.findIndex(s=>s.n===sign.n)).bemestar,
+      conselho: conselho || localHoroscope(SIGNS.findIndex(s=>s.n===sign.n)).conselho,
+      cor: cor || localHoroscope(SIGNS.findIndex(s=>s.n===sign.n)).cor,
+      numero: numero || localHoroscope(SIGNS.findIndex(s=>s.n===sign.n)).numero,
+    };
+  }catch(err){
+    clearTimeout(timeout);
+    return null;
+  }
+}
+
+async function showHoro(i){
   document.querySelectorAll('.zodiac-item').forEach(el=>el.classList.remove('active'));
   document.getElementById('z-'+i).classList.add('active');
   const sign = SIGNS[i];
-  const seed = todayKey()+'-'+sign.n;
-  const pick = (arr, salt) => arr[hashStr(seed+salt) % arr.length];
-  const num = (hashStr(seed+'num') % 89) + 1;
-  const cor = pick(CORES, 'cor');
   const panel = document.getElementById('horoPanel');
-  panel.innerHTML = `
-    <div class="horo-date">Horóscopo de hoje</div>
-    <h3>${sign.s} ${sign.n}</h3>
-    <div class="horo-grid">
-      <div class="horo-item"><b>❤️ Amor</b><p>${pick(HORO_VARIANTS.amor,'amor')}</p></div>
-      <div class="horo-item"><b>💼 Trabalho</b><p>${pick(HORO_VARIANTS.trabalho,'trab')}</p></div>
-      <div class="horo-item"><b>💰 Dinheiro</b><p>${pick(HORO_VARIANTS.dinheiro,'din')}</p></div>
-      <div class="horo-item"><b>🌿 Bem-estar</b><p>${pick(HORO_VARIANTS.bemestar,'bem')}</p></div>
-      <div class="horo-item"><b>🎨 Cor da sorte</b><p>${cor}</p></div>
-      <div class="horo-item"><b>🔢 Número da sorte</b><p>${num}</p></div>
-      <div class="horo-item"><b>🌙 Conselho lunar</b><p>${pick(HORO_VARIANTS.conselho,'con')}</p></div>
-    </div>`;
-  panel.classList.add('show');
-  panel.scrollIntoView({behavior:'smooth', block:'nearest'});
+
+  const renderPanel = (h) => {
+    panel.innerHTML = `
+      <div class="horo-date">Horóscopo de hoje</div>
+      <h3>${sign.s} ${sign.n}</h3>
+      <div class="horo-grid">
+        <div class="horo-item"><b>❤️ Amor</b><p>${esc(h.amor)}</p></div>
+        <div class="horo-item"><b>💼 Trabalho</b><p>${esc(h.trabalho)}</p></div>
+        <div class="horo-item"><b>💰 Dinheiro</b><p>${esc(h.dinheiro)}</p></div>
+        <div class="horo-item"><b>🌿 Bem-estar</b><p>${esc(h.bemestar)}</p></div>
+        <div class="horo-item"><b>🎨 Cor da sorte</b><p>${esc(h.cor)}</p></div>
+        <div class="horo-item"><b>🔢 Número da sorte</b><p>${esc(h.numero)}</p></div>
+        <div class="horo-item"><b>🌙 Conselho lunar</b><p>${esc(h.conselho)}</p></div>
+      </div>`;
+    panel.classList.add('show');
+    panel.scrollIntoView({behavior:'smooth', block:'nearest'});
+  };
+
+  // Mostra o conteúdo local instantaneamente (nunca deixa a pessoa esperando),
+  // e troca pelo horóscopo real se a API responder a tempo.
+  renderPanel(localHoroscope(i));
+  const remote = await fetchRemoteHoroscope(sign);
+  if(remote) renderPanel(remote);
 }
 
 /* ============ MAPA ASTRAL — pedidos com pagamento via Pix ============ */
