@@ -1,7 +1,8 @@
 exports.handler = async (event, context) => {
-  const signo = event.queryStringParameters.sign || 'aquarius';
+  // Importa a biblioteca de forma dinâmica para evitar erros de versão do Node
+  const fetch = (await import('node-fetch')).default;
   
-  // Monta a URL com os parâmetros de busca corretos
+  const signo = event.queryStringParameters.sign || 'aquarius';
   const url = `https://rapidapi.com{signo}&language=pt&type=daily`;
 
   const options = {
