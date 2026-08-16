@@ -4,14 +4,22 @@
 // A chave da API fica guardada como variável de ambiente no painel do Netlify —
 // ela NUNCA aparece no código do site nem no GitHub.
 //
-// O site chama: /.netlify/functions/horoscopo?sign=ÁRIES
-// Esta função busca o horóscopo real na RapidAPI e devolve o resultado.
+// O site chama: /.netlify/functions/horoscopo?sign=Áries
+// Esta função busca o horóscopo real na RapidAPI (horoscope-api.p.rapidapi.com) e devolve o resultado.
 //
 // Configuração necessária no Netlify (Site settings → Environment variables):
-//   RAPIDAPI_KEY        -> sua "X-RapidAPI Key" (obrigatória)
-//   HOROSCOPE_API_KEY   -> o campo "apiKey" que aparece no playground da API (se a API pedir; opcional)
+//   RAPIDAPI_KEY -> sua "Chave X-RapidAPI" (obrigatória)
 
-const RAPIDAPI_HOST = 'horoscopo-brasil.p.rapidapi.com';
+const RAPIDAPI_HOST = 'horoscope-api.p.rapidapi.com';
+
+// Remove acentos e deixa minúsculo, para bater com o formato esperado pela API (ex: "Áries" -> "aries").
+function normalizeSign(sign) {
+  return sign
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim();
+}
 
 exports.handler = async function (event) {
   const headers = {
@@ -25,18 +33,17 @@ exports.handler = async function (event) {
     return { statusCode: 204, headers, body: '' };
   }
 
-  const sign = (event.queryStringParameters && event.queryStringParameters.sign || '').trim();
-  if (!sign) {
+  const rawSign = (event.queryStringParameters && event.queryStringParameters.sign || '').trim();
+  if (!rawSign) {
     return {
       statusCode: 400,
       headers,
-      body: JSON.stringify({ error: 'Parâmetro "sign" é obrigatório. Ex: /.netlify/functions/horoscopo?sign=ÁRIES' }),
+      body: JSON.stringify({ error: 'Parâmetro "sign" é obrigatório. Ex: /.netlify/functions/horoscopo?sign=Áries' }),
     };
   }
+  const sign = normalizeSign(rawSign);
 
   const RAPIDAPI_KEY = process.env.RAPIDAPI_KEY;
-  const HOROSCOPE_API_KEY = process.env.HOROSCOPE_API_KEY; // opcional, depende da API
-
   if (!RAPIDAPI_KEY) {
     return {
       statusCode: 500,
@@ -45,18 +52,17 @@ exports.handler = async function (event) {
     };
   }
 
-  const today = new Date().toISOString().slice(0, 10);
-  const url = `https://${RAPIDAPI_HOST}/rest/v1/horoscopes?date=${today}&sign=${encodeURIComponent(sign)}`;
-
-  const reqHeaders = {
-    'Content-Type': 'application/json',
-    'x-rapidapi-host': RAPIDAPI_HOST,
-    'x-rapidapi-key': RAPIDAPI_KEY,
-  };
-  if (HOROSCOPE_API_KEY) reqHeaders['apiKey'] = HOROSCOPE_API_KEY;
+  const url = `https://${RAPIDAPI_HOST}/pt/${encodeURIComponent(sign)}`;
 
   try {
-    const response = await fetch(url, { method: 'GET', headers: reqHeaders });
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-rapidapi-host': RAPIDAPI_HOST,
+        'x-rapidapi-key': RAPIDAPI_KEY,
+      },
+    });
 
     if (!response.ok) {
       return {
