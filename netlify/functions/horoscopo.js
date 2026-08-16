@@ -1,8 +1,10 @@
 const https = require('https');
 
 exports.handler = async (event, context) => {
-  const signo = event.queryStringParameters.sign || 'aquarius';
-  const url = `https://rapidapi.com{signo}&language=pt&type=daily`;
+  const signo = (event.queryStringParameters && event.queryStringParameters.sign) || 'aquarius';
+  
+  // URL montada de forma simples e limpa
+  const url = 'https://rapidapi.com' + signo + '&language=pt&type=daily';
 
   const options = {
     method: 'GET',
