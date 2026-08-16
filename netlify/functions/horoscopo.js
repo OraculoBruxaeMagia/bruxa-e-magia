@@ -1,15 +1,11 @@
-const axios = require('axios');
-
 exports.handler = async (event, context) => {
   const signo = event.queryStringParameters.sign || 'aquarius';
-   const options = {
+  
+  // Monta a URL com os parâmetros de busca corretos
+  const url = `https://rapidapi.com{signo}&language=pt&type=daily`;
+
+  const options = {
     method: 'GET',
-    url: 'https://rapidapi.com',
-    params: {
-      zodiac: signo,
-      language: 'pt',
-      type: 'daily'
-    },
     headers: {
       'X-RapidAPI-Key': process.env.RAPIDAPI_KEY,
       'X-RapidAPI-Host': process.env.RAPIDAPI_HOST
@@ -17,7 +13,14 @@ exports.handler = async (event, context) => {
   };
 
   try {
-    const response = await axios.request(options);
+    const res = await fetch(url, options);
+    
+    if (!res.ok) {
+      throw new Error(`Erro na API do Horóscopo: Status ${res.status}`);
+    }
+
+    const data = await res.json();
+
     return {
       statusCode: 200,
       headers: {
@@ -25,16 +28,16 @@ exports.handler = async (event, context) => {
         "Access-Control-Allow-Headers": "Content-Type",
         "Content-Type": "application/json"
       },
-      body: JSON.stringify(response.data)
+      body: JSON.stringify(data)
     };
   } catch (error) {
     return {
-      statusCode: error.response ? error.response.status : 500,
+      statusCode: 500,
       headers: {
         "Access-Control-Allow-Origin": "*",
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({ error: "A API de horóscopo respondeu com erro.", detalhe: error.message })
+      body: JSON.stringify({ error: "Falha ao carregar os dados.", detalhe: error.message })
     };
   }
 };
