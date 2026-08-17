@@ -667,6 +667,58 @@ function hashStr(s){ let h=0; for(let i=0;i<s.length;i++){ h = (h<<5)-h + s.char
 function todayKey(){ const d=new Date(); return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`; }
 function esc(s){ return String(s??'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
+puxarCartaDoTarotAPI()
+  function closeModal(){ document.getElementById('modalOverlay').classList.remove('show'); }
+function hashStr(s){ let h=0; for(let i=0; i<s.length; i++){ h = ((h<<5)-h + s.charCodeAt(i))|0; } return Math.abs(h); }
+function todayKey(){ const d=new Date(); return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`; }
+function esc(s){ return String(s??'').replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+// Cole a função do Tarot aqui:
+async function puxarCartaDoTarotAPI() {
+  const tarotReadings = document.getElementById('tarotReadings');
+  if (tarotReadings) {
+    tarotReadings.innerHTML = '<div class="glass reading-card"><h3>Embaralhando as cartas...</h3><p>Conectando com o baralho de Rider-Waite...</p></div>';
+  }
+
+  try {
+    const resposta = await fetch('/.netlify/functions/tarot');
+    const dados = await resposta.json();
+
+    if (dados.cards && dados.cards.length > 0) {
+      const carta = dados.cards[0];
+      
+      if (tarotReadings) {
+        tarotReadings.innerHTML = `
+          <div class="glass reading-card">
+            <h3>${carta.name} (${carta.type === 'major' ? 'Arcano Maior' : 'Arcano Menor'})</h3>
+            <p><b>Significado:</b> ${carta.meaning_up}</p>
+            <div class="reading-kv">
+              <div>
+                <b>Descrição</b>
+                <p>${carta.desc}</p>
+              </div>
+              <div>
+                <b>Posição</b>
+                <p>Normal / Direita</p>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+    } else {
+      if (tarotReadings) {
+        tarotReadings.innerHTML = '<div class="glass reading-card"><h3>Aviso</h3><p>Não foi possível puxar a carta neste momento.</p></div>';
+      }
+    }
+  } catch (erro) {
+    console.error(erro);
+    if (tarotReadings) {
+      tarotReadings.innerHTML = '<div class="glass reading-card"><h3>Erro</h3><p>Falha ao conectar com a API de Tarot.</p></div>';
+    }
+  }
+}
+
+/* =================== mobile menu =================== */
 /* ============ mobile menu ============ */
 function toggleMenu(){
   const open = document.getElementById('mmenu').classList.toggle('open');
