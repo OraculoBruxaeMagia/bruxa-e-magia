@@ -666,14 +666,6 @@ function closeModal(){ document.getElementById('modalOverlay').classList.remove(
 function hashStr(s){ let h=0; for(let i=0;i<s.length;i++){ h = (h<<5)-h + s.charCodeAt(i); h|=0; } return Math.abs(h); }
 function todayKey(){ const d=new Date(); return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`; }
 function esc(s){ return String(s??'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-
-puxarCartaDoTarotAPI()
-  function closeModal(){ document.getElementById('modalOverlay').classList.remove('show'); }
-function hashStr(s){ let h=0; for(let i=0; i<s.length; i++){ h = ((h<<5)-h + s.charCodeAt(i))|0; } return Math.abs(h); }
-function todayKey(){ const d=new Date(); return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`; }
-function esc(s){ return String(s??'').replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
-
-// Cole a função do Tarot aqui:
 async function puxarCartaDoTarotAPI() {
   const tarotReadings = document.getElementById('tarotReadings');
   if (tarotReadings) {
@@ -691,20 +683,26 @@ async function puxarCartaDoTarotAPI() {
         tarotReadings.innerHTML = `
           <div class="glass reading-card">
             <h3>${carta.name} (${carta.type === 'major' ? 'Arcano Maior' : 'Arcano Menor'})</h3>
-            <p><b>Significado:</b> ${carta.meaning_up}</p>
+            <p>${carta.desc}</p>
             <div class="reading-kv">
-              <div>
-                <b>Descrição</b>
-                <p>${carta.desc}</p>
-              </div>
-              <div>
-                <b>Posição</b>
-                <p>Normal / Direita</p>
-              </div>
+              <div><b>❤️ Significado</b><p>${carta.meaning_up}</p></div>
+              <div><b>💼 Inverso</b><p>${carta.meaning_rev || 'N/A'}</p></div>
+              <div><b>💰 Tipo</b><p>${carta.type}</p></div>
+              <div><b>🌙 Conselho</b><p>Confie na energia desta carta para o seu momento.</p></div>
             </div>
           </div>
         `;
       }
+
+      // Esconde o botão de sortear e mostra o botão de reiniciar (igual o seu código original faz)
+      const drawBtn = document.getElementById('drawBtn');
+      if (drawBtn) drawBtn.style.display = 'none';
+      
+      const newDrawWrap = document.getElementById('newDrawWrap');
+      if (newDrawWrap) {
+        newDrawWrap.innerHTML = '<button class="btn btn-outline" onclick="resetTarot()">Fazer uma nova tiragem</button>';
+      }
+
     } else {
       if (tarotReadings) {
         tarotReadings.innerHTML = '<div class="glass reading-card"><h3>Aviso</h3><p>Não foi possível puxar a carta neste momento.</p></div>';
@@ -718,7 +716,8 @@ async function puxarCartaDoTarotAPI() {
   }
 }
 
-/* =================== mobile menu =================== */
+
+
 /* ============ mobile menu ============ */
 function toggleMenu(){
   const open = document.getElementById('mmenu').classList.toggle('open');
