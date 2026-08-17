@@ -3,14 +3,15 @@ const https = require('https');
 exports.handler = async (event, context) => {
   const signo = (event.queryStringParameters && event.queryStringParameters.sign) || 'aquarius';
   
-  // Endereço correto e isolado para evitar misturas de texto
-  const urlCompleta = 'https://rapidapi.com' + signo + '&language=pt&type=daily';
+  // URL correta fornecida pela RapidAPI
+  const host = process.env.RAPIDAPI_HOST || 'astropredict-daily-horoscopes-lucky-insights.p.rapidapi.com';
+  const urlCompleta = `https://${host}/horoscope?lang=pt&zodiac=${signo}&type=daily&timezone=UTC`;
 
   const options = {
     method: 'GET',
     headers: {
-      'X-RapidAPI-Key': process.env.RAPIDAPI_KEY,
-      'X-RapidAPI-Host': process.env.RAPIDAPI_HOST
+      'x-rapidapi-key': process.env.RAPIDAPI_KEY,
+      'x-rapidapi-host': host
     }
   };
 
