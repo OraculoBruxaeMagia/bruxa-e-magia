@@ -735,6 +735,26 @@ function renderBuziosCats() {
     </button>
   `).join('');
 }
+// Categorias do Jogo de Búzios
+const buziosTemas = [
+  { id: 'geral', nome: '✨ Caminho Geral', desc: 'Uma visão panorâmica sobre o seu momento atual.' },
+  { id: 'amor', nome: '❤️ Amor e Relacionamentos', desc: 'Orientações para o coração e conexões.' },
+  { id: 'trabalho', nome: '💼 Trabalho e Carreira', desc: 'Perspectivas profissionais e projetos.' },
+  { id: 'prosperidade', nome: '💰 Prosperidade e Dinheiro', desc: 'Energias ligadas à abundância material.' }
+];
+
+let temaSelecionadoBuzios = 'geral';
+
+function renderBuziosCats() {
+  const container = document.getElementById('buziosCats');
+  if (!container) return;
+  
+  container.innerHTML = buziosTemas.map(t => `
+    <button class="mode-btn ${t.id === temaSelecionadoBuzios ? 'active' : ''}" onclick="escolherTemaBuzios('${t.id}')">
+      ${t.nome}
+    </button>
+  `).join('');
+}
 
 function escolherTemaBuzios(id) {
   temaSelecionadoBuzios = id;
@@ -789,10 +809,11 @@ function tossBuzios() {
 
   // Animação dos búzios caindo
   const emojisShells = ['🐚', '🐚', '🐚', '🐚', '🐚', '🐚', '🐚'];
-  shells.innerHTML = emojisShells.map(() => `<span class="shell tossed" style="--r: ${Math.floor(Math.random()*60 - 30)}deg;">🐚</span>`).join('');
+  if (shells) {
+    shells.innerHTML = emojisShells.map(() => `<span class="shell tossed" style="--r: ${Math.floor(Math.random()*60 - 30)}deg;">🐚</span>`).join('');
+  }
 
   setTimeout(() => {
-    // Sorteia uma resposta com base no tema escolhido
     const sorteio = respostasBuzios[Math.floor(Math.random() * respostasBuzios.length)];
 
     if (resultBox) {
@@ -812,7 +833,7 @@ function tossBuzios() {
   }, 1000);
 }
 
-// Inicializa os botões de categoria de búzios ao carregar a página
+// Inicializa os botões de categoria de búzios assim que a página carregar
 document.addEventListener('DOMContentLoaded', () => {
   renderBuziosCats();
   const tossBtn = document.getElementById('tossBtn');
