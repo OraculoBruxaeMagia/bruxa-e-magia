@@ -1002,7 +1002,23 @@ function localHoroscope(signIndex){
     numero: num,
   };
 }
+function renderZodiac(){
+    const grid = document.getElementById('zodiacGrid');
+    // Verifique se a variável SIGNS existe globalmente e está correta
+    if (typeof SIGNS === 'undefined' || !SIGNS) {
+        console.error("Variável SIGNS não definida!");
+        grid.innerHTML = '<p>Erro ao carregar os signos. Verifique o console.</p>';
+        return;
+    }
 
+    grid.innerHTML = SIGNS.map((s,i)=>`
+        <div class="glass zodiac-item" id="z-${i}" onclick="showHoro(${i})">
+            <span class="sym">${s.s}</span><span>${s.n}</span>
+        </div>`).join('');
+    
+    const d = new Date();
+    document.getElementById('horoTodayLabel').textContent = 'Atualizado em ' + d.toLocaleDateString('pt-BR', {day:'2-digit', month:'long', year:'numeric'});
+}
 async function fetchRemoteHoroscope(sign){
   try{
     // Mapeia o nome do signo do site para o formato em inglês que a API exige
