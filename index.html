@@ -715,7 +715,109 @@ async function puxarCartaDoTarotAPI() {
     }
   }
 }
+// Categorias do Jogo de Búzios
+const buziosTemas = [
+  { id: 'geral', nome: '✨ Caminho Geral', desc: 'Uma visão panorâmica sobre o seu momento atual.' },
+  { id: 'amor', nome: '❤️ Amor e Relacionamentos', desc: 'Orientações para o coração e conexões.' },
+  { id: 'trabalho', nome: '💼 Trabalho e Carreira', desc: 'Perspectivas profissionais e projetos.' },
+  { id: 'prosperidade', nome: '💰 Prosperidade e Dinheiro', desc: 'Energias ligadas à abundância material.' }
+];
 
+let temaSelecionadoBuzios = 'geral';
+
+function renderBuziosCats() {
+  const container = document.getElementById('buziosCats');
+  if (!container) return;
+  
+  container.innerHTML = buziosTemas.map(t => `
+    <button class="mode-btn ${t.id === temaSelecionadoBuzios ? 'active' : ''}" onclick="escolherTemaBuzios('${t.id}')">
+      ${t.nome}
+    </button>
+  `).join('');
+}
+
+function escolherTemaBuzios(id) {
+  temaSelecionadoBuzios = id;
+  renderBuziosCats();
+  const tossBtn = document.getElementById('tossBtn');
+  if (tossBtn) tossBtn.removeAttribute('disabled');
+}
+
+// Respostas simbólicas dos Búzios
+const respostasBuzios = [
+  {
+    titulo: "Abertura de Caminhos (Alafin)",
+    mensagem: "Os ventos sopram a favor e as portas antes fechadas começam a se abrir com clareza.",
+    amor: "Momento de renovação na relação ou de atrair alguém com muita harmonia.",
+    trabalho: "Ideias inovadoras serão bem recebidas. Confie na sua intuição profissional.",
+    dinheiro: "Entrada de energias positivas. Mantenha o foco e evite impulsos.",
+    conselho: "Agradeça pelas pequenas conquistas diárias."
+  },
+  {
+    titulo: "Águas Claras (Oxum)",
+    mensagem: "A suavidade, a intuição e a diplomacia trarão as soluções que você procura.",
+    amor: "Amor próprio em evidência. Relações ganham carinho e cumplicidade.",
+    trabalho: "Bom momento para parcerias e trabalhos em equipe.",
+    dinheiro: "Fluxo financeiro estável, desde que haja equilíbrio nos gastos.",
+    conselho: "Ouça mais a sua voz interior antes de tomar decisões."
+  },
+  {
+    titulo: "Força e Determinação (Ogum)",
+    mensagem: "Coragem para superar obstáculos e romper barreiras com firmeza e foco.",
+    amor: "Defina o que você quer e expresse seus sentimentos com clareza.",
+    trabalho: "Desafios exigirão atitude rápida e liderança. Você dará conta.",
+    dinheiro: "Esforço traz recompensas concretas. Continue batalhando.",
+    conselho: "Não tenha medo de dar o primeiro passo."
+  },
+  {
+    titulo: "Caminhos de Sabedoria (Oxalá)",
+    mensagem: "Paz de espírito, clareza mental e bênçãos para os seus próximos passos.",
+    amor: "Tranquilidade e maturidade nos afetos. Diálogo aberto.",
+    trabalho: "Decisões sensatas trarão frutos duradouros a longo prazo.",
+    dinheiro: "Estabilidade e prudência financeira.",
+    conselho: "Mantenha a fé e a serenidade diante do futuro."
+  }
+];
+
+function tossBuzios() {
+  const shells = document.getElementById('shells');
+  const resultBox = document.getElementById('buziosResult');
+  const tossBtn = document.getElementById('tossBtn');
+  
+  if (tossBtn) tossBtn.setAttribute('disabled', 'true');
+  if (resultBox) resultBox.classList.remove('show');
+
+  // Animação dos búzios caindo
+  const emojisShells = ['🐚', '🐚', '🐚', '🐚', '🐚', '🐚', '🐚'];
+  shells.innerHTML = emojisShells.map(() => `<span class="shell tossed" style="--r: ${Math.floor(Math.random()*60 - 30)}deg;">🐚</span>`).join('');
+
+  setTimeout(() => {
+    // Sorteia uma resposta com base no tema escolhido
+    const sorteio = respostasBuzios[Math.floor(Math.random() * respostasBuzios.length)];
+
+    if (resultBox) {
+      resultBox.innerHTML = `
+        <h3>${sorteio.titulo}</h3>
+        <p>${sorteio.mensagem}</p>
+        <div class="reading-kv">
+          <div><b>❤️ Amor</b><p>${sorteio.amor}</p></div>
+          <div><b>💼 Trabalho</b><p>${sorteio.trabalho}</p></div>
+          <div><b>💰 Dinheiro</b><p>${sorteio.dinheiro}</p></div>
+          <div><b>🌙 Conselho</b><p>${sorteio.conselho}</p></div>
+        </div>
+      `;
+      resultBox.classList.add('show');
+    }
+    if (tossBtn) tossBtn.removeAttribute('disabled');
+  }, 1000);
+}
+
+// Inicializa os botões de categoria de búzios ao carregar a página
+document.addEventListener('DOMContentLoaded', () => {
+  renderBuziosCats();
+  const tossBtn = document.getElementById('tossBtn');
+  if (tossBtn) tossBtn.removeAttribute('disabled');
+});
 
 
 /* ============ mobile menu ============ */
