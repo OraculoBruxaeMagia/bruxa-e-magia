@@ -1013,43 +1013,33 @@ function renderZodiac(){
   document.getElementById('horoTodayLabel').textContent = 'Atualizado em ' + d.toLocaleDateString('pt-BR', {day:'2-digit', month:'long', year:'numeric'});
 }
 
-// Tenta buscar o horóscopo real na função segura do Netlify (/.netlify/functions/horoscopo).
-// Se a função ainda não estiver publicada, falhar, ou demorar demais, cai automaticamente
-// no conteúdo local (que já garante 0 repetição entre signos no mesmo dia).
+// Busca a previsão direto da nossa função do Netlify conectada à RapidAPI
 async function fetchRemoteHoroscope(sign){
-  const controller = new AbortController();
-  const timeout = setTimeout(()=>controller.abort(), 4000);
   try{
-    const res = await fetch(`/.netlify/functions/horoscopo?sign=${encodeURIComponent(sign.n.toUpperCase())}`, {signal: controller.signal});
-    clearTimeout(timeout);
+    // Passamos o nome do signo em minúsculas (ex: aquarius, aries) para a nossa função
+    const signoParam = sign.n.toLowerCase();
+    const res = await fetch(`/.netlify/functions/horoscopo?signo=${signoParam}`);
+    
     if(!res.ok) return null;
     const data = await res.json();
-    if(!data || data.error) return null;
-    // Mapeamento defensivo: aceita alguns formatos comuns de campo, já que a API
-    // externa pode não usar exatamente os mesmos nomes do nosso site.
-    const pick = (...keys) => { for(const k of keys){ if(data[k]) return data[k]; } return null; };
-    const amor = pick('amor','love','romance');
-    const trabalho = pick('trabalho','work','career','profissional');
-    const dinheiro = pick('dinheiro','money','finance','financas');
-    const bemestar = pick('bem_estar','bemestar','health','wellness','saude');
-    const conselho = pick('conselho','advice','tip','mensagem') || pick('description','geral','resumo');
-    const cor = pick('cor','color','lucky_color','cor_da_sorte');
-    const numero = pick('numero','number','lucky_number','numero_da_sorte');
-    // Se a API não trouxe pelo menos amor/trabalho/dinheiro, considera insuficiente e usa o plano B.
-    if(!amor || !trabalho || !dinheiro) return null;
-    return {
-      amor, trabalho, dinheiro,
-      bemestar: bemestar || localHoroscope(SIGNS.findIndex(s=>s.n===sign.n)).bemestar,
-      conselho: conselho || localHoroscope(SIGNS.findIndex(s=>s.n===sign.n)).conselho,
-      cor: cor || localHoroscope(SIGNS.findIndex(s=>s.n===sign.n)).cor,
-      numero: numero || localHoroscope(SIGNS.findIndex(s=>s.n===sign.n)).numero,
-    };
+    
+    // Se a API retornou o texto do horóscopo com sucesso
+    if(data && data.horoscope){
+      return {
+        conselho: data.horoscope,
+        amor: "Previsão baseada no alinhamento diário dos astros.",
+        trabalho: "Mantenha o foco em seus objetivos profissionais.",
+        dinheiro: "Analise com cautela suas finanças hoje.",
+        bemestar: "Equilíbrio entre mente e corpo.",
+        cor: "Variada",
+        numero: "7"
+      };
+    }
+    return null;
   }catch(err){
-    clearTimeout(timeout);
     return null;
   }
 }
-
 async function showHoro(i){
   document.querySelectorAll('.zodiac-item').forEach(el=>el.classList.remove('active'));
   document.getElementById('z-'+i).classList.add('active');
