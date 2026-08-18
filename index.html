@@ -1003,27 +1003,30 @@ function localHoroscope(signIndex){
   };
 }
 
-function renderZodiac(){
-  const grid = document.getElementById('zodiacGrid');
-  grid.innerHTML = SIGNS.map((s,i)=>`
-    <div class="glass zodiac-item" id="z-${i}" onclick="showHoro(${i})">
-      <span class="sym">${s.s}</span><span>${s.n}</span>
-    </div>`).join('');
-  const d = new Date();
-  document.getElementById('horoTodayLabel').textContent = 'Atualizado em ' + d.toLocaleDateString('pt-BR', {day:'2-digit', month:'long', year:'numeric'});
-}
-
-// Busca a previsão direto da nossa função do Netlify conectada à RapidAPI
 async function fetchRemoteHoroscope(sign){
   try{
-    // Passamos o nome do signo em minúsculas (ex: aquarius, aries) para a nossa função
-    const signoParam = sign.n.toLowerCase();
-    const res = await fetch(`/.netlify/functions/horoscopo?signo=${signoParam}`);
+    // Mapeia o nome do signo do site para o formato em inglês que a API exige
+    const mapaSignos = {
+      'Áries': 'aries',
+      'Touro': 'taurus',
+      'Gêmeos': 'gemini',
+      'Câncer': 'cancer',
+      'Leão': 'leo',
+      'Virgem': 'virgo',
+      'Libra': 'libra',
+      'Escorpião': 'scorpio',
+      'Sagitário': 'sagittarius',
+      'Capricórnio': 'capricorn',
+      'Aquário': 'aquarius',
+      'Peixes': 'pisces'
+    };
+    
+    const nomeEmIngles = mapaSignos[sign.n] || 'aries';
+    const res = await fetch(`/.netlify/functions/horoscopo?signo=${nomeEmIngles}`);
     
     if(!res.ok) return null;
     const data = await res.json();
     
-    // Se a API retornou o texto do horóscopo com sucesso
     if(data && data.horoscope){
       return {
         conselho: data.horoscope,
