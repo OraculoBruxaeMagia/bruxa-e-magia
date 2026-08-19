@@ -1043,22 +1043,25 @@ async function fetchRemoteHoroscope(sign){
     if(!res.ok) return null;
     const data = await res.json();
     
+    // CORREÇÃO AQUI: Extraindo os dados dinâmicos mapeados da API AstroPredict
     if(data && data.horoscope){
       return {
-        conselho: data.horoscope,
-        amor: "Previsão baseada no alinhamento diário dos astros.",
-        trabalho: "Mantenha o foco em seus objetivos profissionais.",
-        dinheiro: "Analise com cautela suas finanças hoje.",
-        bemestar: "Equilíbrio entre mente e corpo.",
-        cor: "Variada",
-        numero: "7"
+        conselho: data.horoscope || "Sem previsão disponível.",
+        amor: data.love || "Previsão de amor não disponível no momento.",
+        trabalho: data.career || data.work || "Previsão profissional indisponível.",
+        dinheiro: data.money || data.finance || "Previsão financeira indisponível.",
+        bemestar: data.health || "Dicas de bem-estar não disponíveis.",
+        cor: data.lucky_color || data.color || "Variada",
+        numero: data.lucky_number || data.number || "7"
       };
     }
     return null;
   }catch(err){
+    console.error("Erro na busca do horóscopo:", err);
     return null;
   }
 }
+
 async function showHoro(i){
   document.querySelectorAll('.zodiac-item').forEach(el=>el.classList.remove('active'));
   document.getElementById('z-'+i).classList.add('active');
