@@ -1019,22 +1019,42 @@ function renderZodiac(){
     const d = new Date();
     document.getElementById('horoTodayLabel').textContent = 'Atualizado em ' + d.toLocaleDateString('pt-BR', {day:'2-digit', month:'long', year:'numeric'});
 }
+// 1. Função limpadora de texto para evitar quebras na API de tradução
+function limparTextoBruto(txt) {
+    if (!txt) return '';
+    return txt.replace(/[\r\n]+/g, ' ')
+              .replace(/\\"/g, '"')
+              .replace(/[^a-zA-Z0-9 .,?!'’]/g, '')
+              .trim();
+}
+
+// 2. Tradutor ultra-rápido direto pelo navegador (Google Translate Mirror)
+async function traduzirTextoFront(texto) {
+    const textoLimpo = limparTextoBruto(texto);
+    if (!textoLimpo) return '';
+    try {
+        const url = `https://googleapis.com{encodeURIComponent(textoLimpo)}`;
+        const res = await fetch(url);
+        if (!res.ok) return textoLimpo;
+        const json = await res.json();
+        
+        if (json && json[0]) {
+            return json[0].map(item => item[0]).join('');
+        }
+        return textoLimpo;
+    } catch (e) {
+        return textoLimpo;
+    }
+}
+
+// 3. Busca e mapeamento inteligente das categorias
 async function fetchRemoteHoroscope(sign){
   try{
-    // Mapeia o nome do signo do site para o formato em inglês que a API exige
     const mapaSignos = {
-      'Áries': 'aries',
-      'Touro': 'taurus',
-      'Gêmeos': 'gemini',
-      'Câncer': 'cancer',
-      'Leão': 'leo',
-      'Virgem': 'virgo',
-      'Libra': 'libra',
-      'Escorpião': 'scorpio',
-      'Sagitário': 'sagittarius',
-      'Capricórnio': 'capricorn',
-      'Aquário': 'aquarius',
-      'Peixes': 'pisces'
+      'Áries': 'aries', 'Touro': 'taurus', 'Gêmeos': 'gemini',
+      'Câncer': 'cancer', 'Leão': 'leo', 'Virgem': 'virgo',
+      'Libra': 'libra', 'Escorpião': 'scorpio', 'Sagitário': 'sagittarius',
+      'Capricórnio': 'capricorn', 'Aquário': 'aquarius', 'Peixes': 'pisces'
     };
     
     const nomeEmIngles = mapaSignos[sign.n] || 'aries';
@@ -1043,17 +1063,43 @@ async function fetchRemoteHoroscope(sign){
     if(!res.ok) return null;
     const data = await res.json();
     
-    // CORREÇÃO AQUI: Extraindo os dados dinâmicos mapeados da API AstroPredict
     if(data && data.horoscope){
-      return {
-        conselho: data.horoscope || "Sem previsão disponível.",
-        amor: data.love || "Previsão de amor não disponível no momento.",
-        trabalho: data.career || data.work || "Previsão profissional indisponível.",
-        dinheiro: data.money || data.finance || "Previsão financeira indisponível.",
-        bemestar: data.health || "Dicas de bem-estar não disponíveis.",
-        cor: data.lucky_color || data.color || "Variada",
+      const textoTraduzido = await traduzirTextoFront(data.horoscope);
+      const corTraduzida = await traduzirTextoFront(data.lucky_color || data.color || "Varied");
+
+      let resultadoMapeado = {
+        conselho: "",
+        amor: "Previsão de amor não disponível no momento.",
+        trabalho: "Previsão profissional indisponível.",
+        dinheiro: "Previsão financeira indisponível.",
+        bemestar: "Dicas de bem-estar não disponíveis.",
+        cor: corTraduzida || "Variada",
         numero: data.lucky_number || data.number || "7"
       };
+
+      const frases = textoTraduzido.split(/[.!?]+/).map(f => f.trim()).filter(Boolean);
+      let frasesRestantes = [];
+
+      frases.forEach(frase => {
+        const fraseCompleta = frase + '.';
+        const termo = frase.toLowerCase();
+        
+        if (termo.includes('amor') || termo.includes('romance') || termo.includes('parceir') || termo.includes('coração')) {
+          resultadoMapeado.amor = fraseCompleta;
+        } else if (termo.includes('trabalho') || termo.includes('projeto') || termo.includes('profiss') || termo.includes('carreira') || termo.includes('trabalhar')) {
+          resultadoMapeado.trabalho = fraseCompleta;
+        } else if (termo.includes('dinheiro') || termo.includes('financ') || termo.includes('gastar') || termo.includes('lucro') || termo.includes('investir')) {
+          resultadoMapeado.dinheiro = fraseCompleta;
+        } else if (termo.includes('saúde') || termo.includes('bem-estar') || termo.includes('energia') || termo.includes('corpo') || termo.includes('teimoso')) {
+          resultadoMapeado.bemestar = fraseCompleta;
+        } else {
+          frasesRestantes.push(fraseCompleta);
+        }
+      });
+
+      resultadoMapeado.conselho = frasesRestantes.length > 0 ? frasesRestantes.join(' ') : "Sem previsão disponível.";
+      
+      return resultadoMapeado;
     }
     return null;
   }catch(err){
@@ -1061,6 +1107,7 @@ async function fetchRemoteHoroscope(sign){
     return null;
   }
 }
+
 
 async function showHoro(i){
   document.querySelectorAll('.zodiac-item').forEach(el=>el.classList.remove('active'));
