@@ -1030,20 +1030,29 @@ function limparTextoBruto(txt) {
 
 // 2. Tradutor ultra-rápido direto pelo navegador (Google Translate Mirror)
 async function traduzirTextoFront(texto) {
-    const textoLimpo = limparTextoBruto(texto);
-    if (!textoLimpo) return '';
+    if (!texto) return '';
     try {
-        const url = `https://googleapis.com{encodeURIComponent(textoLimpo)}`;
+        // URL corrigida e limpa, usando a crase (backtick) corretamente
+        const url = `https://googleapis.com{encodeURIComponent(texto)}`;
+        
         const res = await fetch(url);
-        if (!res.ok) return textoLimpo;
+        if (!res.ok) return texto;
         const json = await res.json();
         
+        // Processa a estrutura de arrays que o Google retorna
         if (json && json[0]) {
-            return json[0].map(item => item[0]).join('');
+            let resultado = '';
+            json[0].forEach(parte => {
+                if (parte && parte[0]) {
+                    resultado += parte[0];
+                }
+            });
+            return resultado || texto;
         }
-        return textoLimpo;
+        return texto;
     } catch (e) {
-        return textoLimpo;
+        console.error("Erro na tradução:", e);
+        return texto;
     }
 }
 
