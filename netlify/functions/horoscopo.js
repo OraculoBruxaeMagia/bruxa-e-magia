@@ -4,7 +4,7 @@ exports.handler = async (event, context) => {
     const signo = event.queryStringParameters.signo || 'aries';
     
     const host = process.env.RAPIDAPI_HOST || 'astropredict-data.p.rapidapi.com';
-    const urlCompleta = `https://${host}/horoscope?zodiac=${signo}&type=daily`;
+    const urlCompleta = `https://${host}/horoscope?zodiac=${signo}&type=daily&language=pt`;
 
     const options = {
         method: 'GET',
