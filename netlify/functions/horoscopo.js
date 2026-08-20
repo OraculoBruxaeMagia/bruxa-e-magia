@@ -1,11 +1,12 @@
 const https = require('https');
 
-// Função auxiliar simplificada e direta para o tradutor do Google
-function traduzirTexto(texto, de = 'en', para = 'pt') {
+// Função de tradução gratuita que roda direto no Netlify
+function traduzirTexto(texto) {
     return new Promise((resolve) => {
         if (!texto) return resolve('');
         
-        const url = `https://googleapis.com{de}&tl=${para}&dt=t&q=${encodeURIComponent(texto)}`;
+        // Usando a API pública do MyMemory
+        const url = `https://translated.net{encodeURIComponent(texto)}&langpair=en|pt`;
         
         https.get(url, (res) => {
             let dados = '';
@@ -13,20 +14,13 @@ function traduzirTexto(texto, de = 'en', para = 'pt') {
             res.on('end', () => {
                 try {
                     const json = JSON.parse(dados);
-                    // Captura e junta as strings de tradução da estrutura do Google de forma segura
-                    if (json && json[0]) {
-                        let textoFinal = '';
-                        json[0].forEach(parte => {
-                            if (parte && parte[0]) {
-                                textoFinal += parte[0];
-                            }
-                        });
-                        resolve(textoFinal || texto);
+                    if (json && json.responseData && json.responseData.translatedText) {
+                        resolve(json.responseData.translatedText);
                     } else {
-                        resolve(texto);
+                        resolve(texto); // Se falhar, usa o inglês
                     }
                 } catch (e) {
-                    resolve(texto); 
+                    resolve(texto);
                 }
             });
         }).on('error', () => {
@@ -48,7 +42,7 @@ exports.handler = async (event, context) => {
         }
     };
 
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
         const req = https.request(urlCompleta, options, (res) => {
             let dados = '';
             res.on('data', (chunk) => dados += chunk);
@@ -67,39 +61,42 @@ exports.handler = async (event, context) => {
                     };
 
                     if (apiJson && apiJson.horoscope) {
-                        // Realiza a tradução robusta
-                        const textoTraduzido = await traduzirTexto(apiJson.horoscope, 'en', 'pt');
+                        // 1. Traduz o textão corrido da API
+                        const textoTraduzido = await traduzirTexto(apiJson.horoscope);
                         
-                        // Divide as frases por pontos finais seguidos de espaço
+                        // 2. Divide em frases pelo ponto final
                         const frases = textoTraduzido.split(/(?<=\.)\s+/);
                         let frasesRestantes = [];
 
+                        // 3. Organiza as frases nos blocos corretos do seu site
                         frases.forEach(frase => {
                             const termo = frase.toLowerCase();
                             
-                            // Distribuição inteligente com base nas palavras em português
-                            if (termo.includes('amor') || termo.includes('romance') || termo.includes('parceir') || termo.includes('apaixon')) {
+                            if (termo.includes('amor') || termo.includes('romance') || termo.includes('parceir') || termo.includes('sorte no amor')) {
                                 respostaParaOFront.love = frase;
-                            } else if (termo.includes('trabalho') || termo.includes('projeto') || termo.includes('profiss') || termo.includes('carreira')) {
+                            } else if (termo.includes('trabalho') || termo.includes('projeto') || termo.includes('profiss') || termo.includes('carreira') || termo.includes('trabalhar')) {
                                 respostaParaOFront.career = frase;
-                            } else if (termo.includes('dinheiro') || termo.includes('financ') || termo.includes('gastar') || termo.includes('lucro')) {
+                            } else if (termo.includes('dinheiro') || termo.includes('financ') || termo.includes('gastar') || termo.includes('lucro') || termo.includes('economiz')) {
                                 respostaParaOFront.money = frase;
                             } else if (termo.includes('saúde') || termo.includes('bem-estar') || termo.includes('energia') || termo.includes('corpo')) {
                                 respostaParaOFront.health = frase;
                             } else {
+                                // O que sobrar vira o Conselho Lunar
                                 frasesRestantes.push(frase);
                             }
                         });
 
-                        if(frasesRestantes.length > 0) {
+                        if (frasesRestantes.length > 0) {
                             respostaParaOFront.horoscope = frasesRestantes.join(' ');
                         }
                     }
 
+                    // Traduz a cor da sorte
                     if (apiJson && apiJson.lucky_color) {
-                        respostaParaOFront.lucky_color = await traduzirTexto(apiJson.lucky_color, 'en', 'pt');
+                        respostaParaOFront.lucky_color = await traduzirTexto(apiJson.lucky_color);
                     }
 
+                    // Mapeia o número da sorte
                     if (apiJson && apiJson.lucky_number) {
                         respostaParaOFront.lucky_number = String(apiJson.lucky_number);
                     }
@@ -124,7 +121,7 @@ exports.handler = async (event, context) => {
         });
 
         req.on('error', (erro) => {
-            reject({ statusCode: 500, body: JSON.stringify({ error: erro.message }) });
+            resolve({ statusCode: 500, body: JSON.stringify({ error: erro.message }) });
         });
 
         req.end();
