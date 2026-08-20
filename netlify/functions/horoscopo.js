@@ -1,6 +1,6 @@
 const https = require('https');
 
-// Função auxiliar para traduzir textos sem precisar de bibliotecas externas
+// Função auxiliar simplificada e direta para o tradutor do Google
 function traduzirTexto(texto, de = 'en', para = 'pt') {
     return new Promise((resolve) => {
         if (!texto) return resolve('');
@@ -13,11 +13,20 @@ function traduzirTexto(texto, de = 'en', para = 'pt') {
             res.on('end', () => {
                 try {
                     const json = JSON.parse(dados);
-                    // O Google Translate retorna uma estrutura de arrays aninhados
-                    const resultado = json[0].map(item => item[0]).join('');
-                    resolve(resultado);
+                    // Captura e junta as strings de tradução da estrutura do Google de forma segura
+                    if (json && json[0]) {
+                        let textoFinal = '';
+                        json[0].forEach(parte => {
+                            if (parte && parte[0]) {
+                                textoFinal += parte[0];
+                            }
+                        });
+                        resolve(textoFinal || texto);
+                    } else {
+                        resolve(texto);
+                    }
                 } catch (e) {
-                    resolve(texto); // Retorna o original em inglês caso falhe
+                    resolve(texto); 
                 }
             });
         }).on('error', () => {
@@ -58,18 +67,18 @@ exports.handler = async (event, context) => {
                     };
 
                     if (apiJson && apiJson.horoscope) {
-                        // Traduz o parágrafo inteiro usando nossa função nativa
+                        // Realiza a tradução robusta
                         const textoTraduzido = await traduzirTexto(apiJson.horoscope, 'en', 'pt');
                         
-                        // Divide o texto em frases individuais usando o ponto final
+                        // Divide as frases por pontos finais seguidos de espaço
                         const frases = textoTraduzido.split(/(?<=\.)\s+/);
                         let frasesRestantes = [];
 
-                        // Distribui as frases dinamicamente nas seções do seu front-end
                         frases.forEach(frase => {
                             const termo = frase.toLowerCase();
                             
-                            if (termo.includes('amor') || termo.includes('romance') || termo.includes('parceir')) {
+                            // Distribuição inteligente com base nas palavras em português
+                            if (termo.includes('amor') || termo.includes('romance') || termo.includes('parceir') || termo.includes('apaixon')) {
                                 respostaParaOFront.love = frase;
                             } else if (termo.includes('trabalho') || termo.includes('projeto') || termo.includes('profiss') || termo.includes('carreira')) {
                                 respostaParaOFront.career = frase;
@@ -87,12 +96,10 @@ exports.handler = async (event, context) => {
                         }
                     }
 
-                    // Traduz a cor da sorte
                     if (apiJson && apiJson.lucky_color) {
                         respostaParaOFront.lucky_color = await traduzirTexto(apiJson.lucky_color, 'en', 'pt');
                     }
 
-                    // Mapeia o número da sorte
                     if (apiJson && apiJson.lucky_number) {
                         respostaParaOFront.lucky_number = String(apiJson.lucky_number);
                     }
