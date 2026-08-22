@@ -666,169 +666,6 @@ function closeModal(){ document.getElementById('modalOverlay').classList.remove(
 function hashStr(s){ let h=0; for(let i=0;i<s.length;i++){ h = (h<<5)-h + s.charCodeAt(i); h|=0; } return Math.abs(h); }
 function todayKey(){ const d=new Date(); return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`; }
 function esc(s){ return String(s??'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-async function puxarCartaDoTarotAPI() {
-  const tarotReadings = document.getElementById('tarotReadings');
-  if (tarotReadings) {
-    tarotReadings.innerHTML = '<div class="glass reading-card"><h3>Embaralhando as cartas...</h3><p>Conectando com o baralho de Rider-Waite...</p></div>';
-  }
-
-  try {
-    const resposta = await fetch('/.netlify/functions/tarot');
-    const dados = await resposta.json();
-
-    if (dados.cards && dados.cards.length > 0) {
-      const carta = dados.cards[0];
-      
-      if (tarotReadings) {
-        tarotReadings.innerHTML = `
-          <div class="glass reading-card">
-            <h3>${carta.name} (${carta.type === 'major' ? 'Arcano Maior' : 'Arcano Menor'})</h3>
-            <p>${carta.desc}</p>
-            <div class="reading-kv">
-              <div><b>❤️ Significado</b><p>${carta.meaning_up}</p></div>
-              <div><b>💼 Inverso</b><p>${carta.meaning_rev || 'N/A'}</p></div>
-              <div><b>💰 Tipo</b><p>${carta.type}</p></div>
-              <div><b>🌙 Conselho</b><p>Confie na energia desta carta para o seu momento.</p></div>
-            </div>
-          </div>
-        `;
-      }
-
-      // Esconde o botão de sortear e mostra o botão de reiniciar (igual o seu código original faz)
-      const drawBtn = document.getElementById('drawBtn');
-      if (drawBtn) drawBtn.style.display = 'none';
-      
-      const newDrawWrap = document.getElementById('newDrawWrap');
-      if (newDrawWrap) {
-        newDrawWrap.innerHTML = '<button class="btn btn-outline" onclick="resetTarot()">Fazer uma nova tiragem</button>';
-      }
-
-    } else {
-      if (tarotReadings) {
-        tarotReadings.innerHTML = '<div class="glass reading-card"><h3>Aviso</h3><p>Não foi possível puxar a carta neste momento.</p></div>';
-      }
-    }
-  } catch (erro) {
-    console.error(erro);
-    if (tarotReadings) {
-      tarotReadings.innerHTML = '<div class="glass reading-card"><h3>Erro</h3><p>Falha ao conectar com a API de Tarot.</p></div>';
-    }
-  }
-}
-// Categorias do Jogo de Búzios
-const buziosTemas = [
-  { id: 'geral', nome: '✨ Caminho Geral', desc: 'Uma visão panorâmica sobre o seu momento atual.' },
-  { id: 'amor', nome: '❤️ Amor e Relacionamentos', desc: 'Orientações para o coração e conexões.' },
-  { id: 'trabalho', nome: '💼 Trabalho e Carreira', desc: 'Perspectivas profissionais e projetos.' },
-  { id: 'prosperidade', nome: '💰 Prosperidade e Dinheiro', desc: 'Energias ligadas à abundância material.' }
-];
-
-// Módulo de Búzios Seguro
-if (typeof window.buziosTemas === 'undefined') {
-  window.buziosTemas = [
-    { id: 'geral', nome: '✨ Caminho Geral', desc: 'Uma visão panorâmica sobre o seu momento atual.' },
-    { id: 'amor', nome: '❤️ Amor e Relacionamentos', desc: 'Orientações para o coração e conexões.' },
-    { id: 'trabalho', nome: '💼 Trabalho e Carreira', desc: 'Perspectivas profissionais e projetos.' },
-    { id: 'prosperidade', nome: '💰 Prosperidade e Dinheiro', desc: 'Energias ligadas à abundância material.' }
-  ];
-
-  window.temaSelecionadoBuzios = 'geral';
-
-  window.renderBuziosCats = function() {
-    const container = document.getElementById('buziosCats');
-    if (!container) return;
-    
-    container.innerHTML = window.buziosTemas.map(t => `
-      <button class="mode-btn ${t.id === window.temaSelecionadoBuzios ? 'active' : ''}" onclick="escolherTemaBuzios('${t.id}')">
-        ${t.nome}
-      </button>
-    `).join('');
-  };
-
-  window.escolherTemaBuzios = function(id) {
-    window.temaSelecionadoBuzios = id;
-    window.renderBuziosCats();
-    const tossBtn = document.getElementById('tossBtn');
-    if (tossBtn) tossBtn.removeAttribute('disabled');
-  };
-
-  window.respostasBuzios = [
-    {
-      titulo: "Abertura de Caminhos (Alafin)",
-      mensagem: "Os ventos sopram a favor e as portas antes fechadas começam a se abrir com clareza.",
-      amor: "Momento de renovação na relação ou de atrair alguém com muita harmonia.",
-      trabalho: "Ideias inovadoras serão bem recebidas. Confie na sua intuição profissional.",
-      dinheiro: "Entrada de energias positivas. Mantenha o foco e evite impulsos.",
-      conselho: "Agradeça pelas pequenas conquistas diárias."
-    },
-    {
-      titulo: "Águas Claras (Oxum)",
-      mensagem: "A suavidade, a intuição e a diplomacia trarão as soluções que você procura.",
-      amor: "Amor próprio em evidência. Relações ganham carinho e cumplicidade.",
-      trabalho: "Bom momento para parcerias e trabalhos em equipe.",
-      dinheiro: "Fluxo financeiro estável, desde que haja equilíbrio nos gastos.",
-      conselho: "Ouça mais a sua voz interior antes de tomar decisões."
-    },
-    {
-      titulo: "Força e Determinação (Ogum)",
-      mensagem: "Coragem para superar obstáculos e romper barreiras com firmeza e foco.",
-      amor: "Defina o que você quer e expresse seus sentimentos com clareza.",
-      trabalho: "Desafios exigirão atitude rápida e liderança. Você dará conta.",
-      dinheiro: "Esforço traz recompensas concretas. Continue batalhando.",
-      conselho: "Não tenha medo de dar o primeiro passo."
-    },
-    {
-      titulo: "Caminhos de Sabedoria (Oxalá)",
-      mensagem: "Paz de espírito, clareza mental e bênçãos para os seus próximos passos.",
-      amor: "Tranquilidade e maturidade nos afetos. Diálogo aberto.",
-      trabalho: "Decisões sensatas trarão frutos duradouros a longo prazo.",
-      dinheiro: "Estabilidade e prudência financeira.",
-      conselho: "Mantenha a fé e a serenidade diante do futuro."
-    }
-  ];
-
-  window.tossBuzios = function() {
-    const shells = document.getElementById('shells');
-    const resultBox = document.getElementById('buziosResult');
-    const tossBtn = document.getElementById('tossBtn');
-    
-    if (tossBtn) tossBtn.setAttribute('disabled', 'true');
-    if (resultBox) resultBox.classList.remove('show');
-
-    const emojisShells = ['🐚', '🐚', '🐚', '🐚', '🐚', '🐚', '🐚'];
-    if (shells) {
-      shells.innerHTML = emojisShells.map(() => `<span class="shell tossed" style="--r: ${Math.floor(Math.random()*60 - 30)}deg;">🐚</span>`).join('');
-    }
-
-    setTimeout(() => {
-      const sorteio = window.respostasBuzios[Math.floor(Math.random() * window.respostasBuzios.length)];
-
-      if (resultBox) {
-        resultBox.innerHTML = `
-          <h3>${sorteio.titulo}</h3>
-          <p>${sorteio.mensagem}</p>
-          <div class="reading-kv">
-            <div><b>❤️ Amor</b><p>${sorteio.amor}</p></div>
-            <div><b>💼 Trabalho</b><p>${sorteio.trabalho}</p></div>
-            <div><b>💰 Dinheiro</b><p>${sorteio.dinheiro}</p></div>
-            <div><b>🌙 Conselho</b><p>${sorteio.conselho}</p></div>
-          </div>
-        `;
-        resultBox.classList.add('show');
-      }
-      if (tossBtn) tossBtn.removeAttribute('disabled');
-    }, 1000);
-  };
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  if (typeof window.renderBuziosCats === 'function') {
-    window.renderBuziosCats();
-  }
-  const tossBtn = document.getElementById('tossBtn');
-  if (tossBtn) tossBtn.removeAttribute('disabled');
-});
-
 
 /* ============ mobile menu ============ */
 function toggleMenu(){
@@ -1002,121 +839,42 @@ function localHoroscope(signIndex){
     numero: num,
   };
 }
+
 function renderZodiac(){
-    const grid = document.getElementById('zodiacGrid');
-    // Verifique se a variável SIGNS existe globalmente e está correta
-    if (typeof SIGNS === 'undefined' || !SIGNS) {
-        console.error("Variável SIGNS não definida!");
-        grid.innerHTML = '<p>Erro ao carregar os signos. Verifique o console.</p>';
-        return;
-    }
-
-    grid.innerHTML = SIGNS.map((s,i)=>`
-        <div class="glass zodiac-item" id="z-${i}" onclick="showHoro(${i})">
-            <span class="sym">${s.s}</span><span>${s.n}</span>
-        </div>`).join('');
-    
-    const d = new Date();
-    document.getElementById('horoTodayLabel').textContent = 'Atualizado em ' + d.toLocaleDateString('pt-BR', {day:'2-digit', month:'long', year:'numeric'});
-}
-// 1. Função limpadora de texto para evitar quebras na API de tradução
-function limparTextoBruto(txt) {
-    if (!txt) return '';
-    return txt.replace(/[\r\n]+/g, ' ')
-              .replace(/\\"/g, '"')
-              .replace(/[^a-zA-Z0-9 .,?!'’]/g, '')
-              .trim();
+  const grid = document.getElementById('zodiacGrid');
+  grid.innerHTML = SIGNS.map((s,i)=>`
+    <div class="glass zodiac-item" id="z-${i}" onclick="showHoro(${i})">
+      <span class="sym">${s.s}</span><span>${s.n}</span>
+    </div>`).join('');
+  const d = new Date();
+  document.getElementById('horoTodayLabel').textContent = 'Atualizado em ' + d.toLocaleDateString('pt-BR', {day:'2-digit', month:'long', year:'numeric'});
 }
 
-// 2. Tradutor ultra-rápido direto pelo navegador (Google Translate Mirror)
-async function traduzirTextoFront(texto) {
-    if (!texto) return '';
-    try {
-        // URL corrigida e limpa, usando a crase (backtick) corretamente
-        const url = `https://googleapis.com{encodeURIComponent(texto)}`;
-        
-        const res = await fetch(url);
-        if (!res.ok) return texto;
-        const json = await res.json();
-        
-        // Processa a estrutura de arrays que o Google retorna
-        if (json && json[0]) {
-            let resultado = '';
-            json[0].forEach(parte => {
-                if (parte && parte[0]) {
-                    resultado += parte[0];
-                }
-            });
-            return resultado || texto;
-        }
-        return texto;
-    } catch (e) {
-        console.error("Erro na tradução:", e);
-        return texto;
-    }
-}
-
-// 3. Busca e mapeamento inteligente das categorias
+// Tenta buscar a previsão real na função segura do Netlify (/.netlify/functions/horoscopo),
+// que já devolve o texto em português (a API é chamada com ?lang=pt no servidor).
+// Se a função ainda não estiver publicada, falhar, ou demorar demais, cai automaticamente
+// no conteúdo local (que já garante 0 repetição entre signos no mesmo dia).
+//
+// Design: a previsão real da API vira o "Conselho Lunar" (um parágrafo só, sem tentar
+// recortar artificialmente em Amor/Trabalho/Dinheiro — isso é frágil e engana o leitor,
+// rotulando frases genéricas como se fossem sobre um assunto específico). As demais
+// categorias continuam vindo do sistema local, que é confiável e nunca fica vazio.
 async function fetchRemoteHoroscope(sign){
+  const controller = new AbortController();
+  const timeout = setTimeout(()=>controller.abort(), 5000);
   try{
-    const mapaSignos = {
-      'Áries': 'aries', 'Touro': 'taurus', 'Gêmeos': 'gemini',
-      'Câncer': 'cancer', 'Leão': 'leo', 'Virgem': 'virgo',
-      'Libra': 'libra', 'Escorpião': 'scorpio', 'Sagitário': 'sagittarius',
-      'Capricórnio': 'capricorn', 'Aquário': 'aquarius', 'Peixes': 'pisces'
-    };
-    
-    const nomeEmIngles = mapaSignos[sign.n] || 'aries';
-    const res = await fetch(`/.netlify/functions/horoscopo?signo=${nomeEmIngles}`);
-    
+    const res = await fetch(`/.netlify/functions/horoscopo?sign=${encodeURIComponent(sign.n)}`, {signal: controller.signal});
+    clearTimeout(timeout);
     if(!res.ok) return null;
     const data = await res.json();
-    
-    if(data && data.horoscope){
-      const textoTraduzido = await traduzirTextoFront(data.horoscope);
-      const corTraduzida = await traduzirTextoFront(data.lucky_color || data.color || "Varied");
-
-      let resultadoMapeado = {
-        conselho: "",
-        amor: "Previsão de amor não disponível no momento.",
-        trabalho: "Previsão profissional indisponível.",
-        dinheiro: "Previsão financeira indisponível.",
-        bemestar: "Dicas de bem-estar não disponíveis.",
-        cor: corTraduzida || "Variada",
-        numero: data.lucky_number || data.number || "7"
-      };
-
-      const frases = textoTraduzido.split(/[.!?]+/).map(f => f.trim()).filter(Boolean);
-      let frasesRestantes = [];
-
-      frases.forEach(frase => {
-        const fraseCompleta = frase + '.';
-        const termo = frase.toLowerCase();
-        
-        if (termo.includes('amor') || termo.includes('romance') || termo.includes('parceir') || termo.includes('coração')) {
-          resultadoMapeado.amor = fraseCompleta;
-        } else if (termo.includes('trabalho') || termo.includes('projeto') || termo.includes('profiss') || termo.includes('carreira') || termo.includes('trabalhar')) {
-          resultadoMapeado.trabalho = fraseCompleta;
-        } else if (termo.includes('dinheiro') || termo.includes('financ') || termo.includes('gastar') || termo.includes('lucro') || termo.includes('investir')) {
-          resultadoMapeado.dinheiro = fraseCompleta;
-        } else if (termo.includes('saúde') || termo.includes('bem-estar') || termo.includes('energia') || termo.includes('corpo') || termo.includes('teimoso')) {
-          resultadoMapeado.bemestar = fraseCompleta;
-        } else {
-          frasesRestantes.push(fraseCompleta);
-        }
-      });
-
-      resultadoMapeado.conselho = frasesRestantes.length > 0 ? frasesRestantes.join(' ') : "Sem previsão disponível.";
-      
-      return resultadoMapeado;
-    }
-    return null;
+    const texto = data && (data.horoscope || data.description);
+    if(!texto || typeof texto !== 'string' || texto.length < 10) return null;
+    return { conselho: texto.trim() };
   }catch(err){
-    console.error("Erro na busca do horóscopo:", err);
+    clearTimeout(timeout);
     return null;
   }
 }
-
 
 async function showHoro(i){
   document.querySelectorAll('.zodiac-item').forEach(el=>el.classList.remove('active'));
@@ -1141,11 +899,12 @@ async function showHoro(i){
     panel.scrollIntoView({behavior:'smooth', block:'nearest'});
   };
 
-  // Mostra o conteúdo local instantaneamente (nunca deixa a pessoa esperando),
-  // e troca pelo horóscopo real se a API responder a tempo.
-  renderPanel(localHoroscope(i));
+  // Mostra o conteúdo local instantaneamente (nunca deixa a pessoa esperando, e nunca
+  // mostra "não disponível" — todas as 7 categorias sempre têm texto de verdade).
+  const local = localHoroscope(i);
+  renderPanel(local);
   const remote = await fetchRemoteHoroscope(sign);
-  if(remote) renderPanel(remote);
+  if(remote) renderPanel({ ...local, conselho: remote.conselho });
 }
 
 /* ============ MAPA ASTRAL — pedidos com pagamento via Pix ============ */
