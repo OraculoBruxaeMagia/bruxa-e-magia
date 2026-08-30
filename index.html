@@ -698,338 +698,29 @@ const MODALS = {
 };
 
 /* ============ TAROT ============ */
-
- const DECK = [
-  {
-    n: 'O Louco',
-    s: '🃏',
-    m: 'Espontaneidade, começos audaciosos, salto de fé e desprendimento.',
-    amor: 'Disposição para viver o amor sem amarras, riscos de volatilidade ou imaturidade afetiva.',
-    trabalho: 'Abertura para novos caminhos; momento de ousar em projetos fora da zona de conforto.',
-    dinheiro: 'Cuidado com a ingenuidade e gastos impulsivos sem visão de longo prazo.',
-    c: 'Dê o primeiro passo com coragem, mas não confunda fé com imprudência.',
-    invertida: 'Impulsividade cega, irresponsabilidade, medo paralisante do desconhecido.',
-    jogadas: {
-      obstaculo: 'Falta de planejamento ou recusa em assumir compromissos adultos.',
-      conselhoProfundo: 'Abrace o desconhecido. O excesso de controle está matando sua criatividade.',
-      sintese: 'Momento de reinvenção total e libertação de velhos dogmas.'
-    }
-  },
-  {
-    n: 'O Mago',
-    s: '✨',
-    m: 'Poder pessoal, iniciativa, manifestação e domínio dos elementos.',
-    amor: 'Iniciativa para seduzir ou alinhar o diálogo; clareza sobre intenções afetivas.',
-    trabalho: 'Excelente momento para iniciar projetos, negociar e expor talentos práticos.',
-    dinheiro: 'Habilidade técnica e astúcia para gerar novas fontes de renda.',
-    c: 'Você já possui todos os recursos e ferramentas necessários para manifestar o que deseja.',
-    invertida: 'Manipulação, ilusão, talentos desperdiçados ou promessas sem fundamento.',
-    jogadas: {
-      obstaculo: 'Falta de foco ou uso da lábia para enganar a si mesmo.',
-      conselhoProfundo: 'Canalize sua energia mental em uma única meta antes de tentar abarcar tudo.',
-      sintese: 'Você é o arquiteto da sua própria realidade neste momento.'
-    }
-  },
-  {
-    n: 'A Sacerdotisa',
-    s: '🌙',
-    m: 'Intuição, mistério, sabedoria interior e gestação silenciosa.',
-    amor: 'Sentimentos profundos mantidos em segredo; necessidade de paciência antes da ação.',
-    trabalho: 'Momento de estudo, observação tática e retenção de informações estratégicas.',
-    dinheiro: 'Guarde seus planos financeiros a sete chaves; evite movimentações apressadas.',
-    c: 'Silencie o ruído externo para ouvir a voz sutil da sua intuição.',
-    invertida: 'Secrets tóxicos, intuição reprimida, passividade excessiva ou fofocas.',
-    jogadas: {
-      obstaculo: 'Falta de transparência ou medo de expor o que realmente sente.',
-      conselhoProfundo: 'Não force eventos que ainda estão no período de maturação.',
-      sintese: 'As respostas não estão no mundo exterior, mas no seu inconsciente.'
-    }
-  },
-  {
-    n: 'A Imperatriz',
-    s: '🌸',
-    m: 'Abundância, fertilidade, criação, nutrição e sensualidade.',
-    amor: 'Fase de afeto caloroso, acolhimento, magnetismo e fortalecimento de laços.',
-    trabalho: 'Projetos entrando em fase de expansão e colheita por puro mérito criativo.',
-    dinheiro: 'Prosperidade em crescimento sustentável; boa fase para investimentos na vida pessoal.',
-    c: 'Nutra a si mesmo e aos seus projetos com generosidade e paciência.',
-    invertida: 'Bloqueio criativo, vaidade excessiva, dependência emocional ou esbanjamento.',
-    jogadas: {
-      obstaculo: 'Excesso de descontrole emocional ou autoflagelo por carência.',
-      conselhoProfundo: 'Permita-se receber e desfrutar do belo sem culpa.',
-      sintese: 'Período extremamente fértil para colher o que foi plantado com amor.'
-    }
-  },
-  {
-    n: 'O Imperador',
-    s: '👑',
-    m: 'Estrutura, autoridade, disciplina, ordem e estabilidade material.',
-    amor: 'Busca por estabilidade e compromisso sólido; risco de rigidez ou controle excessivo.',
-    trabalho: 'Liderança firme, consolidação de posições e necessidade de processos organizados.',
-    dinheiro: 'Gestão rígida e eficiente do orçamento; momento de blindar seus ativos.',
-    c: 'Assuma o comando da sua vida com disciplina e limites claros.',
-    invertida: 'Tiranismo, inflexibilidade, fraqueza de caráter ou choque com autoridades.',
-    jogadas: {
-      obstaculo: 'Afeição ao controle cego ou dificuldade para aceitar imprevistos.',
-      conselhoProfundo: 'Construa bases sólidas antes de tentar expandir seus horizontes.',
-      sintese: 'Hora de agir com pragmatismo, razão e autoridade sobre seus atos.'
-    }
-  },
-  {
-    n: 'O Hierofante',
-    s: '📿',
-    m: 'Tradição, mentoria, valores morais, aprendizado e alianças formais.',
-    amor: 'Relacionamento estruturado em valores compartilhados, casamento ou bênção familiar.',
-    trabalho: 'Aprendizado com mentores, respeito às hierarquias e conformidade institucional.',
-    dinheiro: 'Siga métodos tradicionais de investimento e evite atalhos duvidosos.',
-    c: 'Busque aconselhamento ético e aja de acordo com seus valores mais elevados.',
-    invertida: 'Dogmatismo, rebeldia cega, conselhos nocivos ou hipocrisia.',
-    jogadas: {
-      obstaculo: 'Apegos a regras obsoletas apenas por medo de inovar.',
-      conselhoProfundo: 'Honre os ensinamentos do passado, mas passe-os pelo filtro da sua ética.',
-      sintese: 'Momento de alinhar suas ações aos seus princípios fundamentais.'
-    }
-  },
-  {
-    n: 'Os Enamorados',
-    s: '💞',
-    m: 'Escolhas cruciais, livre-arbítrio, união e alinhamento de valores.',
-    amor: 'Encruzilhada afetiva; necessidade de alinhar o desejo com os compromissos reais.',
-    trabalho: 'Decisão estratégica entre dois projetos ou contratos; necessidade de parceria.',
-    dinheiro: 'Dilema entre opções financeiras; exije avaliação ponderada antes de assinar.',
-    c: 'Escolha com o coração, mas certifique-se de que sua mente aprova a decisão.',
-    invertida: 'Conflito interno, indecisão paralisante, infidelidade ou escolhas equivocadas.',
-    jogadas: {
-      obstaculo: 'Fuga da responsabilidade de ter que escolher um lado.',
-      conselhoProfundo: 'Toda escolha implica uma renúncia; aceite as perdas para ganhar o essencial.',
-      sintese: 'Sua realidade atual será moldada pela decisão que você tomar agora.'
-    }
-  },
-  {
-    n: 'O Carro',
-    s: '🐎',
-    m: 'Determinação, triunfo, autocontrole e superação de contradições.',
-    amor: 'Avanço decidido no relacionamento; superação conjunta de obstáculos externos.',
-    trabalho: 'Foco implacável trazendo vitorias rápidas; ascensão na carreira por mérito.',
-    dinheiro: 'Aceleração financeira sob controle rigoroso das rédeas do orçamento.',
-    c: 'Assuma as rédeas dos seus impulsos e siga em frente sem olhar para trás.',
-    invertida: 'Perda de controle, agressividade desmedida, desorientação ou atrasos.',
-    jogadas: {
-      obstaculo: 'Lutar contra forças opostas sem uma estratégia unificada.',
-      conselhoProfundo: 'A vitória não virá pela força bruta, mas pela disciplina interna.',
-      sintese: 'Foco total na meta fará você cruzar a linha de chegada.'
-    }
-  },
-  {
-    n: 'A Força',
-    s: '🦁',
-    m: 'Coragem serena, compaixão, domínio próprio e paciência estratégica.',
-    amor: 'Doma dos instintos primitivos; paciência para curar feridas no relacionamento.',
-    trabalho: 'Resistência psíquica para lidar com pressões sem perder a compostura.',
-    dinheiro: 'Controle de impulsos consumistas por meio do autodomínio.',
-    c: 'Sua verdadeira força reside na gentileza e na serenidade, nunca na violência.',
-    invertida: 'Fraqueza, explosões de raiva, insegurança profunda ou submissão.',
-    jogadas: {
-      obstaculo: 'Tentar resolver conflitos no grito ou na imposição.',
-      conselhoProfundo: 'Conquiste seus medos internos com acolhimento e firmeza suave.',
-      sintese: 'O amor e a perseverança vencem qualquer resistência ostensiva.'
-    }
-  },
-  {
-    n: 'O Eremita',
-    s: '🏮',
-    m: 'Introspecção, sabedoria madura, isolamento produtivo e busca da verdade.',
-    amor: 'Necessidade de solitude para compreender as próprias necessidades emocionais.',
-    trabalho: 'Trabalho focado no bastidor; revisão minuciosa antes de lançar algo ao mundo.',
-    dinheiro: 'Austeridade financeira; momento de cortar o desnecessário e poupar.',
-    c: 'A iluminação que você busca não está nos outros, mas na sua lanterna interna.',
-    invertida: 'Isolamento doentio, amargura, recusa a receber ajuda ou turrice.',
-    jogadas: {
-      obstaculo: 'Fechar-se para o mundo por medo de se machucar.',
-      conselhoProfundo: 'Aprecie a própria companhia para retornar renovado à convivência.',
-      sintese: 'A sabedoria exige tempo, silêncio e desaceleração consciente.'
-    }
-  },
-  {
-    n: 'A Roda da Fortuna',
-    s: '🎡',
-    m: 'Ciclos naturais, imprevistos, impermanência e viradas do destino.',
-    amor: 'Mudança inesperada na dinâmica afetiva; altos e baixos que exigem adaptação.',
-    trabalho: 'Oportunidades repentinas; oscilação que pode ser aproveitada com agilidade.',
-    dinheiro: 'Flutuações de caixa; prepare-se tanto para fases de vacas gordas quanto magras.',
-    c: 'Lembre-se: nada é permanente. Adapte-se ao ciclo atual sem apego.',
-    invertida: 'Resistência à mudança, azar aparente, repetição de erros do passado.',
-    jogadas: {
-      obstaculo: 'Tentar congelar o momento presente e lutar contra a maré.',
-      conselhoProfundo: 'O centro da roda é calmo; não se deixe desestabilizar pelas bordas.',
-      sintese: 'O destino abriu uma brecha: mova-se junto com as transformações.'
-    }
-  },
-  {
-    n: 'A Justiça',
-    s: '⚖️',
-    m: 'Causa e efeito, verdade crua, imparcialidade, ética e acerto de contas.',
-    amor: 'Necessidade de clareza, acordos justos e assumir as consequências de atos passados.',
-    trabalho: 'Avaliação imparcial de desempenho, contratos jurídicos ou decisões formais.',
-    dinheiro: 'Balanço financeiro rigoroso, pagamento de dívidas e declarações em dia.',
-    c: 'Seja honesto consigo mesmo e assuma a responsabilidade por sua colheita.',
-    invertida: 'Injustiça, severidade excessiva, vitimização ou desonestidade.',
-    jogadas: {
-      obstaculo: 'Procurar culpados em vez de encarar os fatos como eles são.',
-      conselhoProfundo: 'Aja com integridade absoluta, pois o universo cobrará a conta exata.',
-      sintese: 'A verdade prevalecerá e cortará qualquer ilusão restante.'
-    }
-  },
-  {
-    n: 'O Enforcado',
-    s: '🌀',
-    m: 'Suspensão temporária, rendição, sacrifício consciente e mudança de perspectiva.',
-    amor: 'Relação em pausa; necessidade de abrir mão do ego para ver o outro sob novo ângulo.',
-    trabalho: 'Projetos travados; momento de aceitar o atraso e reavaliar a estratégia.',
-    dinheiro: 'Recursos retidos temporariamente; evite investimentos forçados agora.',
-    c: 'Mudar seu ângulo de visão é o único modo de desfazer o nó em que se encontra.',
-    invertida: 'Sacrifício inútil, estagnação por preguiça, vitimização e teimosia.',
-    jogadas: {
-      obstaculo: 'Forçar a barra para obter resultados quando tudo pede espera.',
-      conselhoProfundo: 'Abandone a ilusão de controle e deixe que a perspectiva mude.',
-      sintese: 'A renúncia de hoje gerará a libertação de amanhã.'
-    }
-  },
-  {
-    n: 'A Morte',
-    s: '🦋',
-    m: 'Transformação radical, encerramento inevitável, limpeza e renovação.',
-    amor: 'Fim de um padrão afetivo esgotado ou término necessário para o renascimento.',
-    trabalho: 'Ruptura com cargos ou métodos antigos para permitir a entrada do novo.',
-    dinheiro: 'Corte drástico de despesas velhas e reestruturação financeira profunda.',
-    c: 'Deixe ir o que está morto para que a nova vida possa florescer.',
-    invertida: 'Apego doloroso ao passado, medo visceral de mudanças, estagnação tóxica.',
-    jogadas: {
-      obstaculo: 'Resistir ao luto do que acabou e insistir no que não tem mais vida.',
-      conselhoProfundo: 'Não tente ressuscitar o passado. Limpe a área para o futuro.',
-      sintese: 'O fim é apenas a semente disfarçada de um novo começo.'
-    }
-  },
-  {
-    n: 'A Temperança',
-    s: '🕊️',
-    m: 'Moderação, alquimia interna, paciência, alquimia e pacificação.',
-    amor: 'Diálogo sereno, reconciliação e busca pela harmonia e meio-termo.',
-    trabalho: 'Integração perfeita entre equipes e processos; ritmo sustentável.',
-    dinheiro: 'Equilíbrio saudável entre poupar para o futuro e desfrutar no presente.',
-    c: 'Misture os ingredientes da sua vida com calma até encontrar a dose certa.',
-    invertida: 'Desequilíbrio, excessos, impaciência e falta de harmonia nas relações.',
-    jogadas: {
-      obstaculo: 'Extremismo ou querer resolver conflitos na base do imediatismo.',
-      conselhoProfundo: 'A cura é um processo gradual; confie no tempo da maturação.',
-      sintese: 'A paciência e a moderação serão seus melhores guias.'
-    }
-  },
-  {
-    n: 'O Diabo',
-    s: '⛓️',
-    m: 'Apegos materiais, compulsões, sombras, paixão cega e ilusão de aprisionamento.',
-    amor: 'Atração física intensa, mas risco de codependência, ciúme e manipulação.',
-    trabalho: 'Ambição desmedida, foco exclusivo no ganho material ou ambiente tóxico.',
-    dinheiro: 'Ganho financeiro por vias tentadoras ou descontrole com vícios e luxos.',
-    c: 'Assuma a responsabilidade sobre suas sombras e quebre as correntes ilusórias.',
-    invertida: 'Libertação de vício, quebra de contratos abusivos, superação do medo.',
-    jogadas: {
-      obstaculo: 'Ceder aos impulsos destrutivos e culpar fatores externos.',
-      conselhoProfundo: 'Encare suas obsessões de frente; a corrente é mais frouxa do que parece.',
-      sintese: 'Reconheça onde você se vendeu em troca de falsa segurança.'
-    }
-  },
-  {
-    n: 'A Torre',
-    s: '🗼',
-    m: 'Ruptura libertadora, colapso de falsas estruturas, revelação e choque.',
-    amor: 'Desilusão necessária que destrói velhas mentiras e traz a verdade à tona.',
-    trabalho: 'Reestruturação drástica imprevista, perda de ilusões ou fim de contrato.',
-    dinheiro: 'Gasto imprevisto severo; risco de perdas por estruturas mal planejadas.',
-    c: 'Aceite o desabamento das ilusões: o que cai abre espaço para a verdade.',
-    invertida: 'Desastre evitado por pouco, resistência ao inevitável, sofrimento prolongado.',
-    jogadas: {
-      obstaculo: 'Insistir em manter de pé uma estrutura que já está apodrecida.',
-      conselhoProfundo: 'Agradeça pelo choque que destruiu a ilusão antes que fosse tarde.',
-      sintese: 'A verdade libertadora veio em forma de raio; reconstrua sobre a rocha.'
-    }
-  },
-  {
-    n: 'A Estrela',
-    s: '⭐',
-    m: 'Esperança, fé renovada, inspiração divina, serenidade e cura.',
-    amor: 'Renovação da confiança no amor, transparência e leveza nas interações.',
-    trabalho: 'Inspiração fluindo livremente; reconexão com o propósito vocacional.',
-    dinheiro: 'Restabelecimento gradual da saúde financeira com otimismo e pé no chão.',
-    c: 'Mantenha sua fé acesa e seja um farol de esperança para si e para os outros.',
-    invertida: 'Pessimismo, falta de fé, desilusão e bloqueio de inspiração.',
-    jogadas: {
-      obstaculo: 'Ficar olhando para as estrelas e esquecer de agir na terra.',
-      conselhoProfundo: 'Confie que o universo está alinhando os eventos a seu favor.',
-      sintese: 'A fase escura passou; a luz da esperança guia seus novos passos.'
-    }
-  },
-  {
-    n: 'A Lua',
-    s: '🌕',
-    m: 'Ilusões, medos inconscientes, intuição aguçada e incerteza.',
-    amor: 'Mal-entendidos, ciúmes sem fundamento realista e projeções do passado.',
-    trabalho: 'Cenário confuso no ambiente de trabalho; cuidado com falsas promessas.',
-    dinheiro: 'Perigo de enganos, fraudes ou falta de visibilidade nos negócios.',
-    c: 'Navegue pelas noites escuras da mente confiando na intuição, sem sucumbir ao pânico.',
-    invertida: 'Clareza surgindo após confusão, dissipação de ilusões, superação da ansiedade.',
-    jogadas: {
-      obstaculo: 'Permitir que fantasias e paranóias guiem suas ações.',
-      conselhoProfundo: 'Não tome decisões definitivas enquanto a neblina não baixar.',
-      sintese: 'Distinga o medo irracional do aviso real da sua intuição.'
-    }
-  },
-  {
-    n: 'O Sol',
-    s: '☀️',
-    m: 'Sucesso, clareza meridiana, vitalidade, verdade e alegria radiante.',
-    amor: 'Transparência, momentos de alegria pura, cumplicidade e celebração a dois.',
-    trabalho: 'Triunfo, reconhecimento público e clareza nos objetivos profissionais.',
-    dinheiro: 'Fase de prosperidade brilhante e retorno evidente sobre investimentos.',
-    c: 'Exponha sua verdade à luz e celebre as conquistas sem falsa modéstia.',
-    invertida: 'Orgulho excessivo, otimismo ingênuo, atraso no sucesso ou queimadura pelo ego.',
-    jogadas: {
-      obstaculo: 'Deixar o ego e a vaidade cegarem seu discernimento.',
-      conselhoProfundo: 'Permita que sua luz brilhe sem medo de ofuscar quem prefere a sombra.',
-      sintese: 'A verdade se manifestou plenamente: dia de vitória e clareza.'
-    }
-  },
-  {
-    n: 'O Julgamento',
-    s: '📯',
-    m: 'Chamado interior, renascimento, absolvição, despertar e prestação de contas.',
-    amor: 'Perdão libertador, ajuste de contas do passado e renascimento do vínculo.',
-    trabalho: 'Despertar de uma nova vocação ou transição decisiva de carreira.',
-    dinheiro: 'Momento de colher os frutos das escolhas passadas com total transparência.',
-    c: 'Ouça o chamado para a sua nova versão e deixe os velhos erros no passado.',
-    invertida: 'Autocrítica destrutiva, recusa em evoluir, remorso e apego ao passado.',
-    jogadas: {
-      obstaculo: 'Ficar se punindo por erros antigos em vez de aprender e seguir.',
-      conselhoProfundo: 'Chegou a hora de se levantar e assumir o seu verdadeiro papel.',
-      sintese: 'Um novo ciclo de vida clama por você; não olhe para trás.'
-    }
-  },
-  {
-    n: 'O Mundo',
-    s: '🌍',
-    m: 'Realização plena, conclusão de ciclo, integração total e triunfo.',
-    amor: 'Sensação de plenitude, encerramento feliz de etapas e parceria completa.',
-    trabalho: 'Meta alcançada com louvor; reconhecimento internacional ou expansão de horizontes.',
-    dinheiro: 'Abundância sólida decorrente do cumprimento de um ciclo completo de trabalho.',
-    c: 'Sinta orgulho do caminho percorrido e prepare-se para integrar novas jornadas.',
-    invertida: 'Falta de encerramento, metas inacabadas, estagnação na reta final.',
-    jogadas: {
-      obstaculo: 'Deixar pontas soltas que impedem o fechamento definitivo do ciclo.',
-      conselhoProfundo: 'Celebre a totalidade da sua jornada; você chegou onde precisava.',
-      sintese: 'A jornada do herói se completa aqui. Você está pronto para o próximo nível.'
-    }
-  }
+const DECK = [
+  {n:'O Louco', s:'🃏', m:'Novos começos e liberdade de espírito.', amor:'Abertura para viver algo novo, sem amarras.', trabalho:'Momento de arriscar um caminho diferente.', dinheiro:'Cautela com gastos por impulso.', c:'Confie no primeiro passo, mesmo sem ver todo o caminho.'},
+  {n:'O Mago', s:'✨', m:'Poder pessoal e capacidade de realizar.', amor:'Você tem clareza do que deseja para o relacionamento.', trabalho:'Bom momento para colocar planos em ação.', dinheiro:'Habilidade para transformar ideias em resultado.', c:'Use os recursos que já estão em suas mãos.'},
+  {n:'A Sacerdotisa', s:'🌙', m:'Intuição, mistério e sabedoria interior.', amor:'Escute o que a intuição diz antes de decidir.', trabalho:'Momento de observar mais do que agir.', dinheiro:'Evite decisões financeiras precipitadas.', c:'Silencie a mente para ouvir a intuição.'},
+  {n:'A Imperatriz', s:'🌸', m:'Abundância, cuidado e criatividade.', amor:'Fase de carinho, acolhimento e presença.', trabalho:'Boa energia para projetos criativos.', dinheiro:'Prosperidade construída com paciência.', c:'Cuide de si com a mesma generosidade que oferece aos outros.'},
+  {n:'O Imperador', s:'👑', m:'Estrutura, disciplina e estabilidade.', amor:'Necessidade de mais estrutura e compromisso.', trabalho:'Organização trará resultados sólidos.', dinheiro:'Planejamento é a chave agora.', c:'Coloque ordem onde há dispersão.'},
+  {n:'O Hierofante', s:'📿', m:'Tradição, aprendizado e valores.', amor:'Relação que se apoia em valores compartilhados.', trabalho:'Aprendizado com quem tem mais experiência.', dinheiro:'Siga métodos já testados.', c:'Busque orientação em quem você confia.'},
+  {n:'Os Enamorados', s:'💞', m:'Escolhas, união e alinhamento de valores.', amor:'Momento de decisão importante no relacionamento.', trabalho:'Escolha entre dois caminhos possíveis.', dinheiro:'Parcerias podem trazer bons resultados.', c:'Escolha com o coração e com a razão juntos.'},
+  {n:'O Carro', s:'🐎', m:'Determinação e movimento em direção a um objetivo.', amor:'Avance com confiança na direção que deseja.', trabalho:'Foco e disciplina trazem conquistas.', dinheiro:'Controle é essencial para o progresso.', c:'Mantenha o rumo mesmo diante de obstáculos.'},
+  {n:'A Força', s:'🦁', m:'Coragem serena e domínio sobre os próprios impulsos.', amor:'Paciência e gentileza fortalecem o vínculo.', trabalho:'Supere desafios com calma, não com pressa.', dinheiro:'Evite decisões por ansiedade.', c:'Sua força está na serenidade, não na pressa.'},
+  {n:'O Eremita', s:'🏮', m:'Introspecção e busca por respostas internas.', amor:'Momento de olhar para dentro antes de se abrir.', trabalho:'Pausa necessária para reavaliar o caminho.', dinheiro:'Reveja seus gastos com calma.', c:'A resposta que procura está no silêncio.'},
+  {n:'A Roda da Fortuna', s:'🎡', m:'Ciclos, mudanças e o movimento natural da vida.', amor:'Uma mudança de fase está a caminho.', trabalho:'Boas oportunidades podem surgir de repente.', dinheiro:'Fase de virada — fique atento às oportunidades.', c:'Flua com as mudanças em vez de resistir a elas.'},
+  {n:'A Justiça', s:'⚖️', m:'Equilíbrio, verdade e consequências.', amor:'Momento de honestidade e equilíbrio na relação.', trabalho:'Decisões justas trazem reconhecimento.', dinheiro:'Organize contas e pendências.', c:'Aja com integridade e colha o que semear.'},
+  {n:'O Enforcado', s:'🌀', m:'Pausa, entrega e novo ponto de vista.', amor:'Veja a relação por um novo ângulo.', trabalho:'Espere o momento certo para agir.', dinheiro:'Evite forçar decisões agora.', c:'Às vezes, não fazer nada também é um movimento.'},
+  {n:'A Morte', s:'🦋', m:'Encerramentos que abrem espaço para o novo.', amor:'Um ciclo se fecha para outro começar.', trabalho:'Deixe ir o que já não serve.', dinheiro:'Corte o que não é mais necessário.', c:'Toda transformação pede uma despedida.'},
+  {n:'A Temperança', s:'🕊️', m:'Equilíbrio, paciência e harmonia.', amor:'Busque o meio-termo nos desentendimentos.', trabalho:'Combine esforço com paciência.', dinheiro:'Equilíbrio entre gastar e guardar.', c:'A harmonia se constrói aos poucos.'},
+  {n:'O Diabo', s:'⛓️', m:'Apegos, padrões e o que nos prende.', amor:'Observe padrões que se repetem na relação.', trabalho:'Cuidado com excesso de cobrança sobre si.', dinheiro:'Atenção a gastos ligados a impulsos.', c:'Reconhecer o padrão já é o início da liberdade.'},
+  {n:'A Torre', s:'🗼', m:'Ruptura súbita que revela uma verdade.', amor:'Uma mudança inesperada traz clareza.', trabalho:'Reestruturações podem ser necessárias.', dinheiro:'Evite riscos financeiros neste momento.', c:'O que desaba abre espaço para reconstruir melhor.'},
+  {n:'A Estrela', s:'⭐', m:'Esperança, cura e inspiração.', amor:'Renovação da confiança e da leveza.', trabalho:'Inspiração guia os próximos passos.', dinheiro:'Boas perspectivas se desenham aos poucos.', c:'Confie no processo de cura em curso.'},
+  {n:'A Lua', s:'🌕', m:'Intuição, sonhos e o que ainda não está claro.', amor:'Sentimentos ambíguos pedem mais clareza.', trabalho:'Nem tudo está visível ainda — tenha paciência.', dinheiro:'Evite decisões baseadas apenas em medo.', c:'Confie na intuição mesmo sem ter todas as respostas.'},
+  {n:'O Sol', s:'☀️', m:'Alegria, vitalidade e clareza.', amor:'Momento de leveza e conexão verdadeira.', trabalho:'Reconhecimento e energia para realizar.', dinheiro:'Boa fase para colher resultados.', c:'Celebre o que já floresceu em você.'},
+  {n:'O Julgamento', s:'📯', m:'Renascimento e chamado interior.', amor:'Momento de perdoar e recomeçar.', trabalho:'Um chamado para mudar de direção.', dinheiro:'Reavalie escolhas passadas com clareza.', c:'Ouça o chamado que vem de dentro.'},
+  {n:'O Mundo', s:'🌍', m:'Realização, plenitude e ciclos completos.', amor:'Sensação de completude e gratidão.', trabalho:'Um ciclo se conclui com sucesso.', dinheiro:'Colheita de um esforço bem plantado.', c:'Celebre a jornada antes de iniciar a próxima.'},
 ];
 let tarotMode = '1';
 function setTarotMode(mode, btn){
@@ -1103,156 +794,11 @@ const SIGNS = [
 // nenhum signo repita a frase de outro — a distribuição diária é feita por embaralhamento
 // determinístico (mesma lógica todo mundo vê no mesmo dia, muda dia a dia).
 const HORO_VARIANTS = {
-  amor: [
-    'Momento oportuno para abrir espaço a conversas sinceras e vulneráveis.',
-    'A leveza aproxima as almas; a pressa constante acaba por afastá-las.',
-    'Um gesto pequeno e genuíno pode fortalecer um vínculo importante hoje.',
-    'Excelente fase para praticar a escuta ativa e reagir com mais maturidade.',
-    'A conexão verdadeira exige presença real, não uma ilusão de perfeição.',
-    'Respeite e cuide dos silêncios com a mesma atenção dedicada às palavras.',
-    'Um reencontro inesperado pode trazer clareza sobre sentimentos antigos.',
-    'Evite interpretar a pausa do outro como uma resposta definitiva ou Rejeição.',
-    'Expor suas vulnerabilidades hoje é sinal de coragem, jamais de fraqueza.',
-    'Um "eu sinto" pronunciado com afeto vale mais que mil justificativas rasas.',
-    'A paciência demonstrada hoje evitará um desgaste emocional desnecessário amanhã.',
-    'Demonstre reconhecimento a alguém especial que tem se esforçado ao seu lado.',
-    'Nem todo afastamento significa fim — às vezes é apenas necessidade de espaço.',
-    'Um convite simples e sem pretensões pode reaproximar quem andava distante.',
-    'O amor floresce na rotina quando há disposição para cultivar a cumplicidade.',
-    'Evite criar expectativas sobre o que o outro não prometeu entregar.',
-    'Um olhar atento percebe entrelinhas que as palavras costumam esconder.',
-    'A maturidade afetiva começa quando você para de cobrar o que pode oferecer.',
-    'Não guarde mágoas antigas em um espaço que deveria ser de afeto novo.',
-    'Ressignifique divergências pequenas antes que elas se tornem barreiras invisíveis.',
-    'O afeto se consolida na constância dos atos diários, não nos grandes discursos.',
-    'Permita que o outro te conheça além das defesas que você ergueu.',
-    'Saber ceder com elegância fortalece a união sem anular sua individualidade.',
-    'Um elogio sincero sobre a essência de quem você ama muda o tom do dia.',
-    'Esteja presente por inteiro nos momentos simples a dois; a rotina guarda encantos.',
-    'A empatia é a ponte mais curta para resolver qualquer ruído na comunicação.',
-    'Antes de exigir compreensão, experimente colocar-se verdadeiramente no lugar do outro.',
-    'Amar também é saber celebrar a evolução e a liberdade da pessoa amada.'
-  ],
-  trabalho: [
-    'A organização estratégica traz clareza absoluta para os seus próximos passos.',
-    'Um projeto engavetado pode ganhar novo fôlego com uma abordagem inovadora.',
-    'Evite comprometer-se com prazos irreais apenas para agradar terceiros hoje.',
-    'Excelente energia para revisar o planejamento tático antes de iniciar a execução.',
-    'Alianças e parcerias bem alinhadas tendem a render excelentes frutos em breve.',
-    'Mantenha a confiança no método e no ritmo que já vêm trazendo resultados sólidos.',
-    'Uma conversa direta e objetiva resolve pendências melhor que longos e-mails.',
-    'Foque em finalizar tarefas pendentes em vez de pulverizar sua atenção em novas frentes.',
-    'Solicite apoio técnico ou operacional antes que a demanda se torne um gargalo.',
-    'Suas ideias possuem valor real; apresente-as com firmeza e clareza hoje.',
-    'Delegar responsabilidades com critério é demonstração de liderança e estratégia.',
-    'Reavalie seus compromissos com calma antes de assumir novos projetos extenuantes.',
-    'O reconhecimento sincero ao trabalho de um colega fortalece o clima da equipe.',
-    'O obstáculo que parecia intransponível ontem pode ser resolvido após uma breve pausa.',
-    'A constância no trabalho supera o entusiasmo passageiro na entrega de resultados.',
-    'Mantenha o foco no que está sob seu controle e filtre ruídos externos no ambiente.',
-    'Uma postura proativa diante de um imprevisto demonstrará sua maturidade profissional.',
-    'Aprimore seus processos internos para economizar tempo nas tarefas diárias.',
-    'Documentar acordos e decisões evita mal-entendidos futuros com clientes ou pares.',
-    'Esteja aberto a feedbacks construtivos; eles contêm insumos valiosos de crescimento.',
-    'Sua capacidade de adaptação será o grande diferencial competitivo no dia de hoje.',
-    'Priorize a qualidade técnica da entrega em detrimento da velocidade apressada.',
-    'Uma visão sistêmica do negócio ajudará a identificar oportunidades negligenciadas.',
-    'Mantenha a postura ética mesmo quando o caminho mais curto parecer tentador.',
-    'A clareza na divisão de papeis evita a sobreposição desnecessária de esforços.',
-    'Cultive uma rede de contatos baseada no respeito mútuo e na troca de valor real.',
-    'Saber dizer "não" a demandas fora do escopo protege a excelência do seu trabalho.',
-    'A inovação costuma surgir da simplificação de algo que se tornou complexo demais.'
-  ],
-  dinheiro: [
-    'Reavalie com critério um gasto supérfluo que pode ser postergado sem prejuízos.',
-    'Momento ideal para estruturar seu orçamento financeiro com disciplina e calma.',
-    'Evite tomar decisões financeiras ou investimentos movido por impulsos momentâneos.',
-    'Um planejamento financeiro simples, se seguido à risca, trará grande tranquilidade.',
-    'O hábito de poupar pequenos montantes hoje garante sustentabilidade no futuro.',
-    'Analise suas reais prioridades antes de realizar qualquer compromisso financeiro maior.',
-    'Realize pesquisas de mercado e compare condições antes de fechar qualquer contrato.',
-    'Quitar ou negociar uma pendência financeira menor evitará juros pesados no futuro.',
-    'Revisar assinaturas e serviços recorrentes pouco utilizados trará uma economia imediata.',
-    'Mantenha comprovantes e registros organizados para evitar surpresas no final do mês.',
-    'O dia favorece a análise minuciosa de planilhas em vez de compras por empolgação.',
-    'Uma receita extra ou inesperada pede prudência na alocação, não gastos eufóricos.',
-    'Antes de emprestar recursos, avalie o impacto dessa decisão no seu próprio orçamento.',
-    'Pequenas renúncias diárias constroem a base para a realização de grandes metas.',
-    'A construção da estabilidade financeira exige mais disciplina do que grandes ganhos.',
-    'Monitore as pequenas despesas diárias; elas costumam passar despercebidas.',
-    'Evite recorrer ao crédito facilitado para custear um padrão de vida momentâneo.',
-    'Pesquise opções de investimentos alinhadas ao seu perfil de risco atual.',
-    'Crie uma reserva de emergência antes de buscar alocações de maior volatilidade.',
-    'A educação financeira é o melhor investimento para proteger o seu patrimônio.',
-    'Pense no valor do seu tempo ao converter o custo de um produto em horas trabalhadas.',
-    'Evite fazer compras para suprir carências emocionais ou momentos de estresse.',
-    'Renegocie contratos antigos com fornecedores para ajustar custos operacionais.',
-    'A clareza sobre seus ativos e passivos é o primeiro passo para a independência.',
-    'Planeje suas compras futuras com antecedência para aproveitar melhores condições.',
-    'Respeite os limites do seu orçamento sem ceder a comparações sociais externas.',
-    'Um diagnóstico financeiro honesto permite corrigir a rota antes de gerar escassez.',
-    'A verdadeira riqueza reside no controle consciente sobre os recursos que você possui.'
-  ],
-  bemestar: [
-    'Priorize um descanso reparador hoje, recolhendo-se mais cedo se houver possibilidade.',
-    'Pausas estratégicas ao longo do dia são essenciais para manter o equilíbrio mental.',
-    'Mantenha-se hidratado, faça respirações profundas e reduza o ritmo quando necessário.',
-    'Seu corpo emite sinais claros pedindo menos urgência e mais desaceleração.',
-    'Uma caminhada leve ao ar livre ajudará a dissipar a névoa mental e renovar o foco.',
-    'Blindar sua energia vital deve ser sua prioridade antes de assumir problemas alheios.',
-    'Desconectar-se das telas e notificações por algumas horas trará alívio imediato.',
-    'Praticar alongamentos simples ao longo do dia alivia tensões acumuladas na musculatura.',
-    'Faça suas refeições com atenção plena, sem distrações digitais, nutrindo o corpo com calma.',
-    'A respiração consciente é sua ferramenta mais ágil para restaurar o eixo interno.',
-    'Compreenda que o descanso não é perda de tempo, mas parte fundamental da alta performance.',
-    'Estabelecer limites claros hoje é um ato profundo de respeito à sua saúde mental.',
-    'A exposição à luz solar matinal auxilia na regulação do seu ritmo circadiano.',
-    'Fique atento à tensão na cervical e nos ombros antes que ela se transforme em dor.',
-    'Cultive pensamentos elevados para evitar o desgaste provocado pelo excesso de ruminação.',
-    'O contato com a natureza ajuda a reordenar o caos interno e restabelecer a paz.',
-    'Evite sobrecarregar sua rotina com tarefas que ultrapassam sua capacidade física.',
-    'Pratique a automassa para aliviar os pontos de estresse acumulados no dia a dia.',
-    'Reduza o consumo de estimulantes no final da tarde para preservar a qualidade do sono.',
-    'Escute as necessidades do seu corpo com a mesma atenção que dedica aos seus compromissos.',
-    'Mantenha uma postura corporal ereta para favorecer a oxigenação e a disposição.',
-    'Reserve um momento do dia para praticar um hobby que não tenha finalidade produtiva.',
-    'A higiene do sono começa horas antes de deitar; diminua as luzes da casa ao anoitecer.',
-    'Um banho morno com foco na sensação da água ajuda a descarregar o estresse mental.',
-    'Aprenda a dizer "não" sem carregar culpa quando sua capacidade física estiver no limite.',
-    'Substitua a autocritica severa por uma postura de acolhimento e paciência consigo mesmo.',
-    'O equilíbrio emocional depende da sua capacidade de filtrar o que entra na sua mente.',
-    'Cuidar do seu templo físico é a garantia de ter vitalidade para desfrutar o futuro.'
-  ],
-  conselho: [
-    'Confie no seu processo pessoal, mesmo quando o progresso parecer imperceptível.',
-    'A sabedoria convida a escutar profundamente antes de elaborar qualquer resposta.',
-    'Compreenda que nem todas as pendências da vida precisam ser resolvidas no mesmo dia.',
-    'Permita que sua intuição oriente decisões cotidianas que a lógica não consegue explicar.',
-    'O silêncio contemplativo costuma revelar respostas que o ruído do mundo esconde.',
-    'Observe com atenção os sinais sutis que as circunstâncias estão lhe apresentando.',
-    'Aquilo que insiste em retornar aos seus pensamentos exige sua investigação e cuidado.',
-    'Em momentos de incerteza, a postura mais corajosa pode ser simplesmente aguardar.',
-    'Deposite mais fé na sua sabedoria interna do que nos medos projetados pela mente.',
-    'Uma investigação honesta e direta esclarece mais do que cenários imaginários.',
-    'A orientação da vida raramente surge em brados; ela se manifesta em sussurros sutis.',
-    'Desapegue-se de velhos padrões que já não servem à versão que você está se tornando.',
-    'Praticar a gratidão pelas pequenas concessões do dia transforma sua percepção da realidade.',
-    'Sua intuição já percebeu o caminho; a mente racional apenas necessita de tempo para assimilar.',
-    'Não force portas que insistem em permanecer fechadas; redirecione sua energia.',
-    'A clareza surge quando você para de tentar controlar todos os desdobramentos futuros.',
-    'Seja firme em seus valores fundamentais, mas flexível na forma de alcançar seus objetivos.',
-    'A pressa em obter respostas frequentemente turva a beleza do aprendizado no caminho.',
-    'Honre a sua trajetória única sem ceder à tentação de se comparar com o ritmo alheio.',
-    'O discernimento consiste em saber exatamente onde aplicar sua energia e o que ignorar.',
-    'Mudar de ideia diante de novos fatos é sinal de inteligência e evolução, não de fraqueza.',
-    'Aceite as imperfeições do percurso; a busca pela perfeição paralisa a ação necessária.',
-    'Tudo o que é genuíno exige tempo para se consolidar com estabilidade e raízes profundas.',
-    'A verdadeira força reside no domínio próprio e na serenidade diante das provações.',
-    'Esteja atento às coincidências; elas costumam indicar que você está no caminho certo.',
-    'Liberte-se da necessidade de aprovação externa para validar suas escolhas pessoais.',
-    'O passado serve como biblioteca de aprendizados, nunca como residência permanente.',
-    'Mantenha a mente aberta e o coração tranquilo; o tempo se encarrega de alinhar tudo.'
-  ]
+  amor:['Momento de abrir espaço para conversas sinceras.','A leveza aproxima; a pressa afasta — vá com calma.','Um gesto pequeno pode fortalecer um vínculo importante.','Boa fase para ouvir mais e reagir menos.','A conexão verdadeira pede presença, não perfeição.','Cuide dos silêncios tanto quanto das palavras.','Um reencontro pode trazer clareza sobre o que você sente.','Evite interpretar o silêncio do outro como resposta.','Vulnerabilidade, hoje, é força — não fraqueza.','Um "eu sinto" bem colocado vale mais que mil justificativas.','A paciência de hoje evita um desgaste amanhã.','Deixe alguém especial saber que você percebeu o esforço dele.','Nem toda distância é rejeição — às vezes é só um respiro.','Um convite simples pode reaproximar quem andou afastado.'],
+  trabalho:['Organização traz clareza para os próximos passos.','Um projeto parado pode ganhar novo fôlego.','Evite prometer mais do que consegue entregar hoje.','Boa energia para revisar um plano antes de agir.','Parcerias podem render bons resultados.','Confie no ritmo que já vem funcionando.','Uma conversa direta resolve mais do que um e-mail longo.','É dia de terminar algo pequeno, não de começar dez coisas novas.','Peça ajuda antes que a tarefa vire um peso sozinho.','Sua ideia merece ser dita em voz alta hoje.','Delegar não é fraqueza, é estratégia.','Revise prazos com calma antes de assumir mais um compromisso.','Um elogio sincero a alguém do time rende mais do que parece.','O que travou ontem pode destravar com uma pausa curta agora.'],
+  dinheiro:['Reveja um gasto que pode esperar.','Boa fase para organizar as contas com calma.','Evite decisões financeiras por impulso.','Um planejamento simples já faz diferença agora.','Guardar um pouco hoje traz alívio amanhã.','Avalie prioridades antes de qualquer compra maior.','Compare preços antes de fechar algo hoje.','Uma dívida pequena, resolvida agora, pesa menos no futuro.','Vale revisar assinaturas que você já nem usa mais.','Guarde o comprovante — pode fazer diferença depois.','Hoje é mais dia de planilha do que de vitrine.','Um extra inesperado pede prudência, não empolgação.','Antes de emprestar, pense em como isso afeta seu próprio mês.','Pequenas economias de hoje sustentam um objetivo maior.'],
+  bemestar:['Durma um pouco mais cedo hoje, se puder.','Uma pausa de alguns minutos já ajuda a recentrar.','Beba água, respire fundo, desacelere.','O corpo pede menos pressa nesse momento.','Um passeio curto pode clarear a mente.','Cuide da sua energia antes de cuidar de tudo mais.','Desligar as notificações por uma hora já ajuda bastante.','Um alongamento rápido muda o resto do seu dia.','Coma com calma, sem tela na frente, ao menos uma vez hoje.','Sua respiração é o controle mais rápido que você tem à mão.','Descansar não é atraso — é parte do processo.','Um "não" hoje pode ser o maior ato de autocuidado.','Luz do sol e alguns minutos ao ar livre fazem diferença real.','Perceba a tensão nos ombros antes que ela vire dor de cabeça.'],
+  conselho:['Confie no seu tempo, mesmo quando parecer lento.','A Lua convida à escuta antes da resposta.','Nem tudo precisa ser resolvido hoje.','Deixe a intuição guiar uma decisão pequena.','O silêncio também é uma forma de sabedoria.','Observe os sinais sutis ao seu redor.','O que insiste em voltar à sua mente merece atenção.','Às vezes, esperar é a ação mais corajosa.','Confie mais no que sente do que no que teme.','Uma pergunta sincera vale mais que dez suposições.','O universo raramente grita — geralmente sussurra.','Solte o que já não cabe na pessoa que você está virando.','Gratidão por um detalhe pequeno muda o tom do seu dia.','Sua intuição já sabe — a mente só está demorando a aceitar.'],
 };
 const CORES = ['Lilás','Dourado','Azul-noite','Branco perolado','Roxo ametista','Verde-lua','Vinho','Prata','Âmbar','Turquesa','Coral','Índigo','Rosa-antigo','Bronze'];
 
@@ -1547,7 +1093,7 @@ function openMagia(i){
 }
 
 /* ============ SIMPATIAS ============ */
-const SIMPATIAS = [
+const SIMPATIAS_PADRAO = [
   {cat:'❤️ Amor', t:'Simpatia da rosa branca', d:'Prática popular de autoacolhimento antes de qualquer intenção voltada a um relacionamento.'},
   {cat:'❤️ Amor', t:'Chá da lua cheia', d:'Ritual simbólico de abertura para novas conexões afetivas.'},
   {cat:'💰 Prosperidade', t:'Moeda na soleira', d:'Tradição popular associada ao convite de fartura para o lar.'},
@@ -1559,9 +1105,34 @@ const SIMPATIAS = [
   {cat:'✨ Renovação', t:'Faxina simbólica', d:'Limpeza da casa como metáfora de renovação interior.'},
   {cat:'🕯️ Harmonia', t:'Vela branca de domingo', d:'Prática simbólica para trazer serenidade ao lar.'},
 ];
-function renderSimpatias(){
-  document.getElementById('simpatiasGrid').innerHTML = SIMPATIAS.map(s=>`
-    <div class="glass simpatia-card"><span class="tag">${s.cat}</span><h4>${s.t}</h4><p style="margin:0;font-size:13.5px;">${s.d}</p></div>`).join('');
+const SIMPATIA_CATS = ['❤️ Amor','💰 Prosperidade','🌿 Proteção','🌙 Lua','🍀 Sorte','✨ Renovação','🕯️ Harmonia'];
+
+async function getSimpatiasIndex(){
+  try{
+    const r = await window.storage.get('simpatias-index', true);
+    return r ? JSON.parse(r.value) : null;
+  }catch(e){ return null; }
+}
+async function saveSimpatiasIndex(list){ await window.storage.set('simpatias-index', JSON.stringify(list), true); }
+
+async function renderSimpatias(){
+  let list = await getSimpatiasIndex();
+  if(list === null){
+    // Primeira vez: semeia o banco com o conteúdo padrão, para o admin poder editar dali em diante.
+    list = SIMPATIAS_PADRAO.map((s,i)=>({ id:'sp-seed-'+i, cat:s.cat, t:s.t, d:s.d }));
+    try{ await saveSimpatiasIndex(list); }catch(e){}
+  }
+  window.__simpatiasCache = list;
+  const grid = document.getElementById('simpatiasGrid');
+  if(!list.length){
+    grid.innerHTML = `<div class="glass" style="grid-column:1/-1; padding:44px; text-align:center;">
+      <p class="eyebrow" style="justify-content:center;">✨ Em preparação</p>
+      <p style="max-width:420px;margin:0 auto;">Novas simpatias serão adicionadas em breve pela área administrativa.</p>
+    </div>`;
+    return;
+  }
+  grid.innerHTML = list.map(s=>`
+    <div class="glass simpatia-card"><span class="tag">${esc(s.cat)}</span><h4>${esc(s.t)}</h4><p style="margin:0;font-size:13.5px;">${esc(s.d)}</p></div>`).join('');
 }
 
 /* ============ MOON PHASES ============ */
@@ -1739,6 +1310,7 @@ async function renderAdmin(){
       <button class="admin-tab ${adminState.tab==='pedidos'?'active':''}" onclick="setAdminTab('pedidos')">Pedidos de Mapa Astral</button>
       <button class="admin-tab ${adminState.tab==='pix'?'active':''}" onclick="setAdminTab('pix')">Chave Pix</button>
       <button class="admin-tab ${adminState.tab==='ebooks'?'active':''}" onclick="setAdminTab('ebooks')">eBooks</button>
+      <button class="admin-tab ${adminState.tab==='simpatias'?'active':''}" onclick="setAdminTab('simpatias')">Simpatias</button>
       <button class="admin-tab ${adminState.tab==='senha'?'active':''}" onclick="setAdminTab('senha')">Alterar senha</button>
       <button class="admin-tab" onclick="adminState.authed=false; renderAdmin();">Sair</button>
     </div>
@@ -1746,6 +1318,7 @@ async function renderAdmin(){
   if(adminState.tab==='pedidos') renderAdminOrders();
   else if(adminState.tab==='pix') renderAdminPix();
   else if(adminState.tab==='senha') renderAdminPassword();
+  else if(adminState.tab==='simpatias') renderAdminSimpatias();
   else renderAdminEbooks();
 }
 async function adminCreatePassword(){
@@ -1959,6 +1532,54 @@ async function removeEbook(id){
   renderEbooks();
 }
 
+/* --- simpatias (admin) --- */
+async function renderAdminSimpatias(){
+  const list = await getSimpatiasIndex() || [];
+  document.getElementById('adminTabContent').innerHTML = `
+    <div class="glass" style="padding:26px;margin-bottom:18px;">
+      <h4>Adicionar simpatia</h4>
+      <label>Categoria</label>
+      <select id="spCat">${SIMPATIA_CATS.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('')}</select>
+      <label>Título</label>
+      <input type="text" id="spTitulo" placeholder="Ex: Banho de arruda">
+      <label>Descrição</label>
+      <textarea id="spDescricao" placeholder="Descrição responsável, como tradição/prática simbólica"></textarea>
+      <button class="btn btn-gold" style="width:100%;" onclick="addSimpatia()">Adicionar</button>
+    </div>
+    <div class="glass" style="padding:26px;">
+      <h4>Simpatias cadastradas (${list.length})</h4>
+      <p style="font-size:12.5px;">Para trocar o conteúdo de vez em quando, remova as antigas e adicione novas — assim a seção não fica sempre igual.</p>
+      ${list.length ? list.map(s=>`
+        <div class="admin-ebook-row">
+          <div style="flex:1;">
+            <span class="tag" style="margin-bottom:4px;">${esc(s.cat)}</span>
+            <div style="font-size:14px;">${esc(s.t)}</div>
+            <div style="font-size:12px;color:var(--lilac);">${esc(s.d)}</div>
+          </div>
+          <button class="btn btn-outline btn-sm" onclick="removeSimpatia('${s.id}')">Remover</button>
+        </div>`).join('') : `<p>Nenhuma simpatia cadastrada ainda.</p>`}
+    </div>`;
+}
+async function addSimpatia(){
+  const t = document.getElementById('spTitulo').value.trim();
+  const d = document.getElementById('spDescricao').value.trim();
+  if(!t || !d){ toast('Preencha o título e a descrição.'); return; }
+  const nova = { id: 'sp-' + Date.now().toString(36), cat: document.getElementById('spCat').value, t, d };
+  const list = (await getSimpatiasIndex()) || [];
+  list.unshift(nova);
+  await saveSimpatiasIndex(list);
+  toast('Simpatia adicionada.');
+  renderAdminSimpatias();
+  renderSimpatias();
+}
+async function removeSimpatia(id){
+  const list = ((await getSimpatiasIndex()) || []).filter(s=>s.id!==id);
+  await saveSimpatiasIndex(list);
+  toast('Simpatia removida.');
+  renderAdminSimpatias();
+  renderSimpatias();
+}
+
 function fmtDate(iso){
   if(!iso) return '—';
   return new Date(iso).toLocaleString('pt-BR', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
@@ -1993,6 +1614,7 @@ window.addEventListener('hashchange', checkAdminVisibility);
 // atualiza as seções que dependem de dados salvos (eBooks e o painel administrativo).
 function onStorageReady(){
   renderEbooks();
+  renderSimpatias();
   renderAdmin();
 }
 </script>
