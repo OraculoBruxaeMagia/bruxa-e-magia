@@ -1,12 +1,12 @@
 const https = require('https');
 
-// Função de tradução gratuita que roda direto no Netlify
+// Função de tradução gratuita
 function traduzirTexto(texto) {
     return new Promise((resolve) => {
         if (!texto) return resolve('');
         
-        // Usando a API pública do MyMemory
-        const url = `https://translated.net{encodeURIComponent(texto)}&langpair=en|pt`;
+        // URL corrigida do MyMemory
+        const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(texto)}&langpair=en|pt`;
         
         https.get(url, (res) => {
             let dados = '';
@@ -17,7 +17,7 @@ function traduzirTexto(texto) {
                     if (json && json.responseData && json.responseData.translatedText) {
                         resolve(json.responseData.translatedText);
                     } else {
-                        resolve(texto); // Se falhar, usa o inglês
+                        resolve(texto);
                     }
                 } catch (e) {
                     resolve(texto);
@@ -30,14 +30,18 @@ function traduzirTexto(texto) {
 }
 
 exports.handler = async (event, context) => {
-    const signo = event.queryStringParameters.signo || 'aries';
-    const host = process.env.RAPIDAPI_HOST || '://rapidapi.com';
+    // Trata e limpa o parâmetro de signo recebido
+    let signo = (event.queryStringParameters && event.queryStringParameters.signo) || 'aries';
+    signo = decodeURIComponent(signo).normalize('NFD').replace(/[\u0300-\u036f]/g, "").toLowerCase();
+
+    // Hosts e endpoints ajustados
+    const host = process.env.RAPIDAPI_HOST || 'same-horoscope-api.p.rapidapi.com';
     const urlCompleta = `https://${host}/horoscope?zodiac=${signo}&type=daily`;
 
     const options = {
         method: 'GET',
         headers: {
-            'x-rapidapi-key': process.env.RAPIDAPI_KEY,
+            'x-rapidapi-key': process.env.RAPIDAPI_KEY || '',
             'x-rapidapi-host': host
         }
     };
@@ -61,17 +65,12 @@ exports.handler = async (event, context) => {
                     };
 
                     if (apiJson && apiJson.horoscope) {
-                        // 1. Traduz o textão corrido da API
                         const textoTraduzido = await traduzirTexto(apiJson.horoscope);
-                        
-                        // 2. Divide em frases pelo ponto final
                         const frases = textoTraduzido.split(/(?<=\.)\s+/);
                         let frasesRestantes = [];
 
-                        // 3. Organiza as frases nos blocos corretos do seu site
                         frases.forEach(frase => {
                             const termo = frase.toLowerCase();
-                            
                             if (termo.includes('amor') || termo.includes('romance') || termo.includes('parceir') || termo.includes('sorte no amor')) {
                                 respostaParaOFront.love = frase;
                             } else if (termo.includes('trabalho') || termo.includes('projeto') || termo.includes('profiss') || termo.includes('carreira') || termo.includes('trabalhar')) {
@@ -81,7 +80,6 @@ exports.handler = async (event, context) => {
                             } else if (termo.includes('saúde') || termo.includes('bem-estar') || termo.includes('energia') || termo.includes('corpo')) {
                                 respostaParaOFront.health = frase;
                             } else {
-                                // O que sobrar vira o Conselho Lunar
                                 frasesRestantes.push(frase);
                             }
                         });
@@ -91,18 +89,16 @@ exports.handler = async (event, context) => {
                         }
                     }
 
-                    // Traduz a cor da sorte
                     if (apiJson && apiJson.lucky_color) {
                         respostaParaOFront.lucky_color = await traduzirTexto(apiJson.lucky_color);
                     }
 
-                    // Mapeia o número da sorte
                     if (apiJson && apiJson.lucky_number) {
                         respostaParaOFront.lucky_number = String(apiJson.lucky_number);
                     }
 
                     resolve({
-                        statusCode: res.statusCode,
+                        statusCode: 200,
                         headers: {
                             "Access-Control-Allow-Origin": "*",
                             "Content-Type": "application/json"
@@ -112,16 +108,20 @@ exports.handler = async (event, context) => {
 
                 } catch (e) {
                     resolve({
-                        statusCode: res.statusCode,
+                        statusCode: 500,
                         headers: { "Access-Control-Allow-Origin": "*", "Content-Type": "application/json" },
-                        body: dados
+                        body: JSON.stringify({ error: "Erro ao processar resposta da API", raw: dados })
                     });
                 }
             });
         });
 
         req.on('error', (erro) => {
-            resolve({ statusCode: 500, body: JSON.stringify({ error: erro.message }) });
+            resolve({ 
+                statusCode: 500, 
+                headers: { "Access-Control-Allow-Origin": "*" },
+                body: JSON.stringify({ error: erro.message }) 
+            });
         });
 
         req.end();
