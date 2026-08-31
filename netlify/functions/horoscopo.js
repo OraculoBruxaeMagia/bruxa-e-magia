@@ -1,11 +1,10 @@
 const https = require('https');
 
-// Função de tradução gratuita
+// Função de tradução gratuita via MyMemory API
 function traduzirTexto(texto) {
     return new Promise((resolve) => {
         if (!texto) return resolve('');
         
-        // URL corrigida do MyMemory
         const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(texto)}&langpair=en|pt`;
         
         https.get(url, (res) => {
@@ -30,11 +29,9 @@ function traduzirTexto(texto) {
 }
 
 exports.handler = async (event, context) => {
-    // Trata e limpa o parâmetro de signo recebido
     let signo = (event.queryStringParameters && event.queryStringParameters.signo) || 'aries';
     signo = decodeURIComponent(signo).normalize('NFD').replace(/[\u0300-\u036f]/g, "").toLowerCase();
 
-    // Hosts e endpoints ajustados
     const host = process.env.RAPIDAPI_HOST || 'same-horoscope-api.p.rapidapi.com';
     const urlCompleta = `https://${host}/horoscope?zodiac=${signo}&type=daily`;
 
@@ -50,13 +47,14 @@ exports.handler = async (event, context) => {
         const req = https.request(urlCompleta, options, (res) => {
             let dados = '';
             res.on('data', (chunk) => dados += chunk);
+            
             res.on('end', async () => {
                 try {
                     const apiJson = JSON.parse(dados);
                     
                     let respostaParaOFront = {
-                        horoscope: "Sem previsão disponível.",
-                        love: "Previsão de amor não disponível no momento.",
+                        horoscope: "Sem previsão geral disponível.",
+                        love: "Previsão de amor não disponível.",
                         career: "Previsão profissional indisponível.",
                         money: "Previsão financeira indisponível.",
                         health: "Dicas de bem-estar não disponíveis.",
@@ -64,37 +62,54 @@ exports.handler = async (event, context) => {
                         lucky_number: "7"
                     };
 
-                    if (apiJson && apiJson.horoscope) {
-                        const textoTraduzido = await traduzirTexto(apiJson.horoscope);
+                    // Pega o texto da previsão (seja de "prediction" ou "horoscope")
+                    const textoBruto = apiJson.prediction || apiJson.horoscope || "";
+
+                    if (textoBruto) {
+                        // 1. Traduz todo o bloco de previsão para Português
+                        const textoTraduzido = await traduzirTexto(textoBruto);
+                        
+                        // 2. Separa por frases
                         const frases = textoTraduzido.split(/(?<=\.)\s+/);
                         let frasesRestantes = [];
 
+                        // 3. Classifica as frases para Amor, Trabalho, Dinheiro e Saúde
                         frases.forEach(frase => {
                             const termo = frase.toLowerCase();
-                            if (termo.includes('amor') || termo.includes('romance') || termo.includes('parceir') || termo.includes('sorte no amor')) {
+                            if (termo.includes('amor') || termo.includes('relacionamento') || termo.includes('parceir') || termo.includes('casal') || termo.includes('romance')) {
                                 respostaParaOFront.love = frase;
-                            } else if (termo.includes('trabalho') || termo.includes('projeto') || termo.includes('profiss') || termo.includes('carreira') || termo.includes('trabalhar')) {
+                            } else if (termo.includes('trabalho') || termo.includes('carreira') || termo.includes('profissio') || termo.includes('projeto') || termo.includes('negócio')) {
                                 respostaParaOFront.career = frase;
-                            } else if (termo.includes('dinheiro') || termo.includes('financ') || termo.includes('gastar') || termo.includes('lucro') || termo.includes('economiz')) {
+                            } else if (termo.includes('dinheiro') || termo.includes('financ') || termo.includes('renda') || termo.includes('ganho') || termo.includes('despesa') || termo.includes('investim')) {
                                 respostaParaOFront.money = frase;
-                            } else if (termo.includes('saúde') || termo.includes('bem-estar') || termo.includes('energia') || termo.includes('corpo')) {
+                            } else if (termo.includes('saúde') || termo.includes('bem-estar') || termo.includes('corpo') || termo.includes('mental') || termo.includes('fadiga')) {
                                 respostaParaOFront.health = frase;
                             } else {
                                 frasesRestantes.push(frase);
                             }
                         });
 
+                        // O restante vira o conselho principal
                         if (frasesRestantes.length > 0) {
                             respostaParaOFront.horoscope = frasesRestantes.join(' ');
                         }
                     }
 
-                    if (apiJson && apiJson.lucky_color) {
-                        respostaParaOFront.lucky_color = await traduzirTexto(apiJson.lucky_color);
+                    // Se a API trouxer compatibilidade amorosa separada
+                    if (apiJson.love_compatibility && respostaParaOFront.love.includes("não disponível")) {
+                        respostaParaOFront.love = await traduzirTexto(apiJson.love_compatibility);
                     }
 
-                    if (apiJson && apiJson.lucky_number) {
-                        respostaParaOFront.lucky_number = String(apiJson.lucky_number);
+                    // Tradução das cores
+                    const corBruta = apiJson.color || apiJson.lucky_color || "";
+                    if (corBruta) {
+                        respostaParaOFront.lucky_color = await traduzirTexto(corBruta);
+                    }
+
+                    // Mapeamento do número da sorte
+                    const numeroBruto = apiJson.number || apiJson.lucky_number || "";
+                    if (numeroBruto) {
+                        respostaParaOFront.lucky_number = String(numeroBruto);
                     }
 
                     resolve({
@@ -110,7 +125,7 @@ exports.handler = async (event, context) => {
                     resolve({
                         statusCode: 500,
                         headers: { "Access-Control-Allow-Origin": "*", "Content-Type": "application/json" },
-                        body: JSON.stringify({ error: "Erro ao processar resposta da API", raw: dados })
+                        body: JSON.stringify({ error: "Erro ao processar resposta", raw: dados })
                     });
                 }
             });
