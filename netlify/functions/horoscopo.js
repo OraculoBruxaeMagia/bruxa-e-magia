@@ -74,26 +74,29 @@ exports.handler = async (event, context) => {
                         let frasesRestantes = [];
 
                         // 3. Classifica as frases para Amor, Trabalho, Dinheiro e Saúde
-                        frases.forEach(frase => {
+  frases.forEach(frase => {
                             const termo = frase.toLowerCase();
-                            if (termo.includes('amor') || termo.includes('relacionamento') || termo.includes('parceir') || termo.includes('casal') || termo.includes('romance')) {
+                            if (termo.includes('amor') || termo.includes('relacionamento') || termo.includes('parceir') || termo.includes('romance')) {
                                 respostaParaOFront.love = frase;
-                            } else if (termo.includes('trabalho') || termo.includes('carreira') || termo.includes('profissio') || termo.includes('projeto') || termo.includes('negócio')) {
+                            } else if (termo.includes('trabalho') || termo.includes('carreira') || termo.includes('profissio') || termo.includes('projeto')) {
                                 respostaParaOFront.career = frase;
-                            } else if (termo.includes('dinheiro') || termo.includes('financ') || termo.includes('renda') || termo.includes('ganho') || termo.includes('despesa') || termo.includes('investim')) {
+                            } else if (termo.includes('dinheiro') || termo.includes('financ') || termo.includes('renda') || termo.includes('gastar')) {
                                 respostaParaOFront.money = frase;
-                            } else if (termo.includes('saúde') || termo.includes('bem-estar') || termo.includes('corpo') || termo.includes('mental') || termo.includes('fadiga')) {
+                            } else if (termo.includes('saúde') || termo.includes('bem-estar') || termo.includes('corpo') || termo.includes('mental')) {
                                 respostaParaOFront.health = frase;
                             } else {
                                 frasesRestantes.push(frase);
                             }
                         });
 
-                        // O restante vira o conselho principal
+                        // Lógica do Conselho Lunar Dinâmico
                         if (frasesRestantes.length > 0) {
                             respostaParaOFront.horoscope = frasesRestantes.join(' ');
+                        } else if (frases.length > 0) {
+                            respostaParaOFront.horoscope = frases[0]; // Usa a primeira frase se nenhuma sobrou
+                        } else {
+                            respostaParaOFront.horoscope = "Mantenha a mente aberta e a intuição afiada para as oportunidades de hoje.";
                         }
-                    }
 
                     // Se a API trouxer compatibilidade amorosa separada
                     if (apiJson.love_compatibility && respostaParaOFront.love.includes("não disponível")) {
