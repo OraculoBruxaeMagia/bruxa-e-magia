@@ -98,46 +98,49 @@ exports.handler = async (event, context) => {
                             respostaParaOFront.horoscope = "Mantenha a mente aberta e a intuição afiada para as oportunidades de hoje.";
                         }
 
-                    // Se a API trouxer compatibilidade amorosa separada
-                    if (apiJson.love_compatibility && respostaParaOFront.love.includes("não disponível")) {
-                        respostaParaOFront.love = await traduzirTexto(apiJson.love_compatibility);
-                    }
+try { // Se a API trouxer compatibilidade amorosa separada
+  if (apiJson.love_compatibility && respostaParaOFront.love.includes("não disponível")) {
+      respostaParaOFront.love = await traduzirTexto(apiJson.love_compatibility);
+  }
 
-                    // Tradução das cores
-                    const corBruta = apiJson.color || apiJson.lucky_color || "";
-                    if (corBruta) {
-                        respostaParaOFront.lucky_color = await traduzirTexto(corBruta);
-                    }
+  // Tradução das cores
+  const corBruta = apiJson.color || apiJson.lucky_color || "";
+  if (corBruta) {
+      respostaParaOFront.lucky_color = await traduzirTexto(corBruta);
+  }
 
-                    // Mapeamento do número da sorte
-                    const numeroBruto = apiJson.number || apiJson.lucky_number || "";
-                    if (numeroBruto) {
-                        respostaParaOFront.lucky_number = String(numeroBruto);
-                    }
+  // Mapeamento do número da sorte
+  const numeroBruto = apiJson.number || apiJson.lucky_number || "";
+  if (numeroBruto) {
+      respostaParaOFront.lucky_number = String(numeroBruto);
+  }
 
-                    resolve({
-                        statusCode: 200,
-                        headers: {
-                            "Access-Control-Allow-Origin": "*",
-                          "Content-Type": "application/json"
-    },
-    body: JSON.stringify(respostaParaOFront)
-  });
-} catch (e) {
   resolve({
-    statusCode: 500,
-    headers: { "Access-Control-Allow-Origin": "*", "Content-Type": "application/json" },
-    body: JSON.stringify({ error: "Erro ao processar resposta", raw: dados })
+      statusCode: 200,
+      headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Content-Type": "application/json"
+      },
+      body: JSON.stringify(respostaParaOFront)
+  });
+
+} catch (e) {                          // <-- este já fecha o try acima
+  resolve({
+      statusCode: 500,
+      headers: { "Access-Control-Allow-Origin": "*", "Content-Type": "application/json" },
+      body: JSON.stringify({ error: "Erro ao processar resposta", raw: dados })
   });
 }
 
-        req.on('error', (erro) => {
-            resolve({ 
-                statusCode: 500, 
-                headers: { "Access-Control-Allow-Origin": "*" },
-                body: JSON.stringify({ error: erro.message }) 
-            });
-        });
+// este fica fora do try/catch
+req.on('error', (erro) => {
+    resolve({ 
+        statusCode: 500, 
+        headers: { "Access-Control-Allow-Origin": "*" },
+        body: JSON.stringify({ error: erro.message }) 
+    });
+});
+
 
         req.end();
     });
