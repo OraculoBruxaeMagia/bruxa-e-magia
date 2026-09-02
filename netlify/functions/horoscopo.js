@@ -119,20 +119,17 @@ exports.handler = async (event, context) => {
                         statusCode: 200,
                         headers: {
                             "Access-Control-Allow-Origin": "*",
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify(respostaParaOFront)
-                    });
-
-                } catch (e) {
-                    resolve({
-                        statusCode: 500,
-                        headers: { "Access-Control-Allow-Origin": "*", "Content-Type": "application/json" },
-                        body: JSON.stringify({ error: "Erro ao processar resposta", raw: dados })
-                    });
-                }
-            });
-        });
+                          "Content-Type": "application/json"
+    },
+    body: JSON.stringify(respostaParaOFront)
+  });
+} catch (e) {
+  resolve({
+    statusCode: 500,
+    headers: { "Access-Control-Allow-Origin": "*", "Content-Type": "application/json" },
+    body: JSON.stringify({ error: "Erro ao processar resposta", raw: dados })
+  });
+}
 
         req.on('error', (erro) => {
             resolve({ 
