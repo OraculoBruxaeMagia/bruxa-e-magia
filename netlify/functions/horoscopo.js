@@ -1,147 +1,90 @@
-const https = require('https');
+// netlify/functions/horoscopo.js
+//
+// Função serverless (roda no servidor do Netlify, nunca no navegador do visitante).
+// A chave da API fica guardada como variável de ambiente no painel do Netlify —
+// ela NUNCA aparece no código do site nem no GitHub.
+//
+// O site chama: /.netlify/functions/horoscopo?sign=Áries
+// Esta função busca o horóscopo real (já em português, via ?lang=pt) na AstroPredict
+// (RapidAPI) e devolve o resultado.
+//
+// Configuração necessária no Netlify (Site settings → Environment variables):
+//   RAPIDAPI_KEY -> sua "X-RapidAPI Key" (obrigatória)
 
-// Função de tradução gratuita via MyMemory API
-function traduzirTexto(texto) {
-    return new Promise((resolve) => {
-        if (!texto) return resolve('');
-        
-        const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(texto)}&langpair=en|pt`;
-        
-        https.get(url, (res) => {
-            let dados = '';
-            res.on('data', (chunk) => dados += chunk);
-            res.on('end', () => {
-                try {
-                    const json = JSON.parse(dados);
-                    if (json && json.responseData && json.responseData.translatedText) {
-                        resolve(json.responseData.translatedText);
-                    } else {
-                        resolve(texto);
-                    }
-                } catch (e) {
-                    resolve(texto);
-                }
-            });
-        }).on('error', () => {
-            resolve(texto);
-        });
-    });
+const RAPIDAPI_HOST = 'astropredict-daily-horoscopes-lucky-insights.p.rapidapi.com';
+
+// A API espera o nome do signo em inglês (aries, taurus, gemini...), então convertemos aqui.
+const ZODIAC_EN = {
+  'aries':'aries', 'touro':'taurus', 'gemeos':'gemini', 'cancer':'cancer',
+  'leao':'leo', 'virgem':'virgo', 'libra':'libra', 'escorpiao':'scorpio',
+  'sagitario':'sagittarius', 'capricornio':'capricorn', 'aquario':'aquarius', 'peixes':'pisces',
+};
+
+function normalizeSign(sign) {
+  return sign.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
 }
 
-exports.handler = async (event, context) => {
-    let signo = (event.queryStringParameters && event.queryStringParameters.signo) || 'aries';
-    signo = decodeURIComponent(signo).normalize('NFD').replace(/[\u0300-\u036f]/g, "").toLowerCase();
+exports.handler = async function (event) {
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Content-Type': 'application/json; charset=utf-8',
+  };
 
-    const host = process.env.RAPIDAPI_HOST || 'same-horoscope-api.p.rapidapi.com';
-    const urlCompleta = `https://${host}/horoscope?zodiac=${signo}&type=daily`;
+  if (event.httpMethod === 'OPTIONS') {
+    return { statusCode: 204, headers, body: '' };
+  }
 
-    const options = {
-        method: 'GET',
-        headers: {
-            'x-rapidapi-key': process.env.RAPIDAPI_KEY || '',
-            'x-rapidapi-host': host
-        }
+  const rawSign = (event.queryStringParameters && event.queryStringParameters.sign || '').trim();
+  if (!rawSign) {
+    return {
+      statusCode: 400,
+      headers,
+      body: JSON.stringify({ error: 'Parâmetro "sign" é obrigatório. Ex: /.netlify/functions/horoscopo?sign=Áries' }),
     };
-
-    return new Promise((resolve) => {
-        const req = https.request(urlCompleta, options, (res) => {
-            let dados = '';
-            res.on('data', (chunk) => dados += chunk);
-            
-            res.on('end', async () => {
-                try {
-                    const apiJson = JSON.parse(dados);
-                    
-                    let respostaParaOFront = {
-                        horoscope: "Sem previsão geral disponível.",
-                        love: "Previsão de amor não disponível.",
-                        career: "Previsão profissional indisponível.",
-                        money: "Previsão financeira indisponível.",
-                        health: "Dicas de bem-estar não disponíveis.",
-                        lucky_color: "Variada",
-                        lucky_number: "7"
-                    };
-
-                    // Pega o texto da previsão (seja de "prediction" ou "horoscope")
-                    const textoBruto = apiJson.prediction || apiJson.horoscope || "";
-
-                    if (textoBruto) {
-                        // 1. Traduz todo o bloco de previsão para Português
-                        const textoTraduzido = await traduzirTexto(textoBruto);
-                        
-                        // 2. Separa por frases
-                        const frases = textoTraduzido.split(/(?<=\.)\s+/);
-                        let frasesRestantes = [];
-
-                        // 3. Classifica as frases para Amor, Trabalho, Dinheiro e Saúde
-  frases.forEach(frase => {
-                            const termo = frase.toLowerCase();
-                            if (termo.includes('amor') || termo.includes('relacionamento') || termo.includes('parceir') || termo.includes('romance')) {
-                                respostaParaOFront.love = frase;
-                            } else if (termo.includes('trabalho') || termo.includes('carreira') || termo.includes('profissio') || termo.includes('projeto')) {
-                                respostaParaOFront.career = frase;
-                            } else if (termo.includes('dinheiro') || termo.includes('financ') || termo.includes('renda') || termo.includes('gastar')) {
-                                respostaParaOFront.money = frase;
-                            } else if (termo.includes('saúde') || termo.includes('bem-estar') || termo.includes('corpo') || termo.includes('mental')) {
-                                respostaParaOFront.health = frase;
-                            } else {
-                                frasesRestantes.push(frase);
-                            }
-                        });
-
-                        // Lógica do Conselho Lunar Dinâmico
-                        if (frasesRestantes.length > 0) {
-                            respostaParaOFront.horoscope = frasesRestantes.join(' ');
-                        } else if (frases.length > 0) {
-                            respostaParaOFront.horoscope = frases[0]; // Usa a primeira frase se nenhuma sobrou
-                        } else {
-                            respostaParaOFront.horoscope = "Mantenha a mente aberta e a intuição afiada para as oportunidades de hoje.";
-                        }
-
-try { // Se a API trouxer compatibilidade amorosa separada
-  if (apiJson.love_compatibility && respostaParaOFront.love.includes("não disponível")) {
-      respostaParaOFront.love = await traduzirTexto(apiJson.love_compatibility);
   }
 
-  // Tradução das cores
-  const corBruta = apiJson.color || apiJson.lucky_color || "";
-  if (corBruta) {
-      respostaParaOFront.lucky_color = await traduzirTexto(corBruta);
+  const zodiac = ZODIAC_EN[normalizeSign(rawSign)];
+  if (!zodiac) {
+    return { statusCode: 400, headers, body: JSON.stringify({ error: `Signo "${rawSign}" não reconhecido.` }) };
   }
 
-  // Mapeamento do número da sorte
-  const numeroBruto = apiJson.number || apiJson.lucky_number || "";
-  if (numeroBruto) {
-      respostaParaOFront.lucky_number = String(numeroBruto);
-  }
-
-  resolve({
-      statusCode: 200,
-      headers: {
-          "Access-Control-Allow-Origin": "*",
-          "Content-Type": "application/json"
-      },
-      body: JSON.stringify(respostaParaOFront)
-  });
-
-} catch (e) {                          // <-- este já fecha o try acima
-  resolve({
+  const RAPIDAPI_KEY = process.env.RAPIDAPI_KEY;
+  if (!RAPIDAPI_KEY) {
+    return {
       statusCode: 500,
-      headers: { "Access-Control-Allow-Origin": "*", "Content-Type": "application/json" },
-      body: JSON.stringify({ error: "Erro ao processar resposta", raw: dados })
-  });
-}
+      headers,
+      body: JSON.stringify({ error: 'RAPIDAPI_KEY não configurada nas variáveis de ambiente do Netlify.' }),
+    };
+  }
 
-// este fica fora do try/catch
-req.on('error', (erro) => {
-    resolve({ 
-        statusCode: 500, 
-        headers: { "Access-Control-Allow-Origin": "*" },
-        body: JSON.stringify({ error: erro.message }) 
+  const url = `https://${RAPIDAPI_HOST}/horoscope?lang=pt&zodiac=${zodiac}&type=daily&timezone=UTC`;
+
+  try {
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-rapidapi-host': RAPIDAPI_HOST,
+        'x-rapidapi-key': RAPIDAPI_KEY,
+      },
     });
-});
 
+    if (!response.ok) {
+      return {
+        statusCode: response.status,
+        headers,
+        body: JSON.stringify({ error: `A API de horóscopo respondeu com status ${response.status}.` }),
+      };
+    }
 
-        req.end();
-    });
+    const data = await response.json();
+    return { statusCode: 200, headers, body: JSON.stringify(data) };
+  } catch (err) {
+    return {
+      statusCode: 502,
+      headers,
+      body: JSON.stringify({ error: 'Falha ao conectar com a API de horóscopo.', details: String(err) }),
+    };
+  }
 };
