@@ -7,7 +7,8 @@
 <meta name="description" content="Bruxa e Magia: tarot interativo, horóscopo diário, mapa astral personalizado, jogo de búzios, magia, simpatias e eBooks sobre autoconhecimento e espiritualidade.">
 <meta name="keywords" content="tarot online, horóscopo diário, mapa astral, jogo de búzios, magia, simpatias, astrologia, autoconhecimento">
 <meta name="robots" content="index, follow">
-<link rel="canonical" href="[https://bruxaemagia.netlify.app/](https://bruxaemagia.netlify.app/)" />
+<link rel="canonical" href="https://oraculobruxaemagia.github.io/bruxa-e-magia/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%99%3C/text%3E%3C/svg%3E">
 <!-- Open Graph / redes sociais -->
 <meta property="og:type" content="website">
 <meta property="og:title" content="Bruxa e Magia — Tarot, Astrologia e Magia">
@@ -862,18 +863,8 @@ function renderZodiac(){
 async function fetchRemoteHoroscope(sign){
   const controller = new AbortController();
   const timeout = setTimeout(()=>controller.abort(), 5000);
-
-  const mapaSignos = {
-    'Áries': 'aries', 'Touro': 'touro', 'Gêmeos': 'gemeos',
-    'Câncer': 'cancer', 'Leão': 'leao', 'Virgem': 'virgem',
-    'Libra': 'libra', 'Escorpião': 'escorpiao', 'Sagitário': 'sagitario',
-    'Capricórnio': 'capricornio', 'Aquário': 'aquario', 'Peixes': 'peixes'
-  };
-
-  const signoLimpo = mapaSignos[sign.n] || sign.n.toLowerCase();
-
   try{
-    const res = await fetch(`/.netlify/functions/horoscopo?signo=${signoLimpo}`, {signal: controller.signal});
+    const res = await fetch(`/.netlify/functions/horoscopo?sign=${encodeURIComponent(sign.n)}`, {signal: controller.signal});
     clearTimeout(timeout);
     if(!res.ok) return null;
     const data = await res.json();
