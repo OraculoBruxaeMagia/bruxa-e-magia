@@ -14,11 +14,11 @@
 
 const RAPIDAPI_HOST = 'best-daily-astrology-and-horoscope-api.p.rapidapi.com';
 
-// A API espera o nome do signo em inglês, com inicial maiúscula (Aries, Taurus...).
+// A API espera o nome do signo em inglês, minúsculo (aries, taurus...).
 const ZODIAC_EN = {
-  'aries':'Aries', 'touro':'Taurus', 'gemeos':'Gemini', 'cancer':'Cancer',
-  'leao':'Leo', 'virgem':'Virgo', 'libra':'Libra', 'escorpiao':'Scorpio',
-  'sagitario':'Sagittarius', 'capricornio':'Capricorn', 'aquario':'Aquarius', 'peixes':'Pisces',
+  'aries':'aries', 'touro':'taurus', 'gemeos':'gemini', 'cancer':'cancer',
+  'leao':'leo', 'virgem':'virgo', 'libra':'libra', 'escorpiao':'scorpio',
+  'sagitario':'sagittarius', 'capricornio':'capricorn', 'aquario':'aquarius', 'peixes':'pisces',
 };
 
 function normalizeSign(sign) {
