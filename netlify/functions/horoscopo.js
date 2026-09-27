@@ -6,11 +6,11 @@
 //
 // O site chama: /.netlify/functions/horoscopo?sign=Áries
 //
-// Esta função busca a previsão do dia na "Daily Rashifal API" (RapidAPI), que devolve
-// os 12 signos em UMA ÚNICA chamada. Para economizar a cota gratuita da API (que costuma
-// ser baixa), o resultado do dia é traduzido para português e guardado no Supabase (o mesmo
-// banco de dados que o site já usa) — assim, a API externa só é chamada 1 vez por dia, não
-// uma vez a cada clique em um signo, não importa quantos visitantes o site tenha.
+// Esta função busca a previsão do dia na "Daily Rashifal API" (RapidAPI), 1 signo por vez
+// (o endpoint que traz os 12 de uma vez só existe no plano pago "MEGA", então usamos o
+// endpoint de signo único: GET /{Rashi}). Para economizar a cota gratuita, cada previsão
+// (já traduzida para português) é guardada no Supabase por 1 dia — assim, se duas pessoas
+// diferentes clicarem no mesmo signo no mesmo dia, a segunda usa o cache, sem gastar cota.
 //
 // Configuração necessária no Netlify (Site settings → Environment variables):
 //   RAPIDAPI_KEY -> sua "Chave X-RapidAPI" (obrigatória)
@@ -22,12 +22,12 @@ const RAPIDAPI_HOST = 'daily-rashifal-api.p.rapidapi.com';
 const SUPABASE_URL = 'https://kvcvjvarllwlrtjjdwsy.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt2Y3ZqdmFybGx3bHJ0ampkd3N5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY0MjE3ODgsImV4cCI6MjEwMTk5Nzc4OH0.x8m-Ve3OsOEDaMqNZyJJXQhFhIm7tNECWPfWSfcBlfU';
 
-// A "rashi" (signo) da API já vem em inglês minúsculo (aries, taurus...), então só
-// precisamos remover acentos e comparar.
+// A API espera o nome do signo em inglês, com inicial maiúscula (Aries, Taurus, ...),
+// exatamente como aparece nos exemplos da documentação (GET /Leo, GET /Aries).
 const ZODIAC_EN = {
-  'aries':'aries', 'touro':'taurus', 'gemeos':'gemini', 'cancer':'cancer',
-  'leao':'leo', 'virgem':'virgo', 'libra':'libra', 'escorpiao':'scorpio',
-  'sagitario':'sagittarius', 'capricornio':'capricorn', 'aquario':'aquarius', 'peixes':'pisces',
+  'aries':'Aries', 'touro':'Taurus', 'gemeos':'Gemini', 'cancer':'Cancer',
+  'leao':'Leo', 'virgem':'Virgo', 'libra':'Libra', 'escorpiao':'Scorpio',
+  'sagitario':'Sagittarius', 'capricornio':'Capricorn', 'aquario':'Aquarius', 'peixes':'Pisces',
 };
 
 function normalizeSign(sign) {
@@ -38,10 +38,10 @@ function todayKey() {
   return new Date().toISOString().slice(0, 10); // AAAA-MM-DD
 }
 
-/* ---------- Supabase: ler/gravar o cache do dia ---------- */
+/* ---------- Supabase: ler/gravar o cache do dia, por signo ---------- */
 
-async function lerCacheDoDia() {
-  const id = 'rashifal:' + todayKey();
+async function lerCache(zodiac) {
+  const id = `rashifal:${todayKey()}:${zodiac.toLowerCase()}`;
   try {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/kv_store?id=eq.${encodeURIComponent(id)}&select=value`, {
       headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
@@ -49,15 +49,14 @@ async function lerCacheDoDia() {
     if (!res.ok) return null;
     const rows = await res.json();
     if (!rows || !rows[0]) return null;
-    return JSON.parse(rows[0].value); // { aries: "texto pt", touro: "texto pt", ... }
+    return JSON.parse(rows[0].value); // { texto: "..." }
   } catch (e) {
     return null;
   }
 }
 
-async function salvarCacheDoDia(mapa) {
-  const dia = todayKey();
-  const id = 'rashifal:' + dia;
+async function salvarCache(zodiac, texto) {
+  const id = `rashifal:${todayKey()}:${zodiac.toLowerCase()}`;
   try {
     await fetch(`${SUPABASE_URL}/rest/v1/kv_store`, {
       method: 'POST',
@@ -67,11 +66,10 @@ async function salvarCacheDoDia(mapa) {
         'Content-Type': 'application/json',
         Prefer: 'resolution=merge-duplicates',
       },
-      body: JSON.stringify({ id, key: id, value: JSON.stringify(mapa), shared: true, updated_at: new Date().toISOString() }),
+      body: JSON.stringify({ id, key: id, value: JSON.stringify({ texto }), shared: true, updated_at: new Date().toISOString() }),
     });
   } catch (e) {
-    // Se não conseguir salvar o cache, sem problema — a função ainda funciona,
-    // só vai chamar a API de novo na próxima vez.
+    // Sem problema se não conseguir salvar — a função ainda funciona, só busca de novo depois.
   }
 }
 
@@ -116,13 +114,30 @@ async function traduzir(texto) {
   return traduzidos.join(' ');
 }
 
-/* ---------- Busca os 12 signos na API e traduz todos ---------- */
+/* ---------- Extrai o texto da previsão, testando formatos comuns ---------- */
 
-async function buscarEDoTraduzirTodos() {
+function extrairTexto(data) {
+  if (!data) return null;
+  // Formato comum 1: { rashifal: "..." } direto na raiz
+  if (typeof data.rashifal === 'string' && data.rashifal.trim().length > 10) return data.rashifal.trim();
+  // Formato comum 2: { result: { rashifal: "..." } }
+  if (data.result && typeof data.result.rashifal === 'string') return data.result.rashifal.trim();
+  // Formato comum 3: { result: [ { rashifal: "..." } ] }
+  if (Array.isArray(data.result) && data.result[0] && typeof data.result[0].rashifal === 'string') return data.result[0].rashifal.trim();
+  // Último recurso: primeiro texto longo encontrado em qualquer campo do objeto.
+  for (const k of Object.keys(data)) {
+    if (typeof data[k] === 'string' && data[k].trim().length > 20) return data[k].trim();
+  }
+  return null;
+}
+
+/* ---------- Busca 1 signo na API e traduz ---------- */
+
+async function buscarEDoTraduzir(zodiac) {
   const RAPIDAPI_KEY = process.env.RAPIDAPI_KEY;
   if (!RAPIDAPI_KEY) throw new Error('RAPIDAPI_KEY não configurada nas variáveis de ambiente do Netlify.');
 
-  const url = `https://${RAPIDAPI_HOST}/all`;
+  const url = `https://${RAPIDAPI_HOST}/${encodeURIComponent(zodiac)}`;
   const response = await fetch(url, {
     method: 'GET',
     headers: {
@@ -142,17 +157,14 @@ async function buscarEDoTraduzirTodos() {
   }
 
   const data = await response.json();
-  const lista = (data && data.result) || [];
-  if (!lista.length) throw new Error('Resposta da API sem a lista "result" esperada.');
-
-  const mapa = {};
-  for (const item of lista) {
-    const rashi = (item.rashi || '').toLowerCase().trim();
-    const textoOriginal = item.rashifal || '';
-    if (!rashi || !textoOriginal) continue;
-    mapa[rashi] = await traduzir(textoOriginal);
+  const textoOriginal = extrairTexto(data);
+  if (!textoOriginal) {
+    const erro = new Error('Resposta da API sem texto de previsão reconhecível.');
+    erro.detalhe = JSON.stringify(data);
+    throw erro;
   }
-  return mapa;
+
+  return traduzir(textoOriginal);
 }
 
 /* ---------- Handler principal ---------- */
@@ -183,19 +195,15 @@ exports.handler = async function (event) {
   }
 
   try {
-    // 1) Tenta usar o cache de hoje (evita gastar a cota da API a cada clique).
-    let mapa = await lerCacheDoDia();
-
-    // 2) Se não tem cache de hoje ainda, busca na API real, traduz, e salva pros próximos.
-    if (!mapa) {
-      mapa = await buscarEDoTraduzirTodos();
-      await salvarCacheDoDia(mapa);
+    // 1) Tenta usar o cache de hoje pra esse signo (evita gastar a cota a cada clique repetido).
+    const cache = await lerCache(zodiac);
+    if (cache && cache.texto) {
+      return { statusCode: 200, headers, body: JSON.stringify({ horoscope: cache.texto }) };
     }
 
-    const texto = mapa[zodiac];
-    if (!texto) {
-      return { statusCode: 200, headers, body: JSON.stringify({ error: `Sem previsão para "${zodiac}" na resposta de hoje.` }) };
-    }
+    // 2) Sem cache ainda hoje: busca na API real, traduz, e salva pros próximos.
+    const texto = await buscarEDoTraduzir(zodiac);
+    await salvarCache(zodiac, texto);
 
     return { statusCode: 200, headers, body: JSON.stringify({ horoscope: texto }) };
   } catch (err) {
